@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'ddr'
+
+Resources:
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-e21ef99a
+      InstanceType: p2.xlarge
+      KeyName: ddr-pdx
+      SecurityGroups: 
+        - !Ref SecGroup
+      Tags:
+      - Key: "Name"
+        Value: "ddr"
+
+  SecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: ddr-secgroup
+      GroupDescription: ddr-secgroup
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '22'
+        ToPort: '22'
+        CidrIp: 0.0.0.0/0
+      #SecurityGroupEgress:
+      #- IpProtocol: tcp
+      #  FromPort: '80'
+      #  ToPort: '80'
+      #  CidrIp: 0.0.0.0/0
+      #Tags:
+      #- Resource Tag
+      #VpcId: vpc-5ea44d39
+      Tags:
+      - Key: "Name"
+        Value: "ddr-secgroup"
+
+Outputs:
+  InstanceId:
+    Value: !Ref Instance
+  PrivateIp:
+    Value: !GetAtt Instance.PrivateIp
+  PublicIp:
+    Value: !GetAtt Instance.PublicIp
