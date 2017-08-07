@@ -39,7 +39,3 @@ Resources:
 Outputs:
   InstanceId:
     Value: !Ref Instance
-  PrivateIp:
-    Value: !GetAtt Instance.PrivateIp
-  PublicIp:
-    Value: !GetAtt Instance.PublicIp
