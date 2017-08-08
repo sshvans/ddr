@@ -5,10 +5,10 @@ Resources:
   Instance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-e21ef99a
+      ImageId: ami-cdddfda8
       InstanceType: p2.xlarge
       KeyName: ddr-pdx
-      SecurityGroups: 
+      SecurityGroups:
         - !Ref SecGroup
       Tags:
       - Key: "Name"
