@@ -68,4 +68,4 @@ cd openpose
 sudo apt-get install python-pip -y
 sudo apt-get install python-numpy -y
 chmod 755 ./ubuntu/install_caffe_and_openpose_if_cuda8.sh
-sudo./ubuntu/install_caffe_and_openpose_if_cuda8.sh
+sudo ./ubuntu/install_caffe_and_openpose_if_cuda8.sh
