@@ -33,7 +33,6 @@ open result.avi
 
 ### Stop Instance
 ```
-INSTANCE_ID=$(aws cloudformation describe-stacks --stack-name ddr --query 'Stacks[].Outputs[?OutputKey==`InstanceId`].OutputValue' --output text); echo $INSTANCE_ID
 aws ec2 stop-instances --instance-ids ${INSTANCE_ID}
 ```
 
