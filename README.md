@@ -36,3 +36,33 @@ open result.avi
 INSTANCE_ID=$(aws cloudformation describe-stacks --stack-name ddr --query 'Stacks[].Outputs[?OutputKey==`InstanceId`].OutputValue' --output text); echo $INSTANCE_ID
 aws ec2 stop-instances --instance-ids ${INSTANCE_ID}
 ```
+
+## Processing Images
+
+### Make directories to hold images and processed images
+``` bash
+ssh -i ~/.ssh/ddr-pdx.pem ubuntu@${PUBLIC_IP}
+mkdir images processed
+```
+
+### Upload test images from local
+``` bash
+LOCAL_IMAGE_DIR=/path/to/your/test/images/dir
+scp -i ~/.ssh/ddr-pdx.pem -r ${LOCAL_IMAGE_DIR}/* ubuntu@${PUBLIC_IP}:~/images/
+```
+
+### Process test images on EC2
+``` bash
+ssh -i ~/.ssh/ddr-pdx.pem ubuntu@${PUBLIC_IP}
+cd ~/openpose
+# JSON Output:
+./build/examples/openpose/openpose.bin --image_dir ~/images --write_keypoint_json ~/processed/ --no_display
+# Rendered images:
+./build/examples/openpose/openpose.bin --image_dir ~/images --write_images ~/processed/ --no_display
+```
+
+### View rendered images locally
+``` bash
+scp -i ~/.ssh/ddr-pdx.pem ubuntu@${PUBLIC_IP}:~/processed/* .
+open *.png
+```
