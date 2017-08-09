@@ -66,3 +66,12 @@ cd ~/openpose
 scp -i ~/.ssh/ddr-pdx.pem ubuntu@${PUBLIC_IP}:~/processed/* .
 open *.png
 ```
+
+### Calculating group score
+* See ddr_score.py, method: fetch_score. It takes computed json of two consecutive captures and returns an array containing: `[average group score, total group score, number of people, array of individual scores]`. We'll use the first value: `average group score`, but other values are present in the result in case we want to make use of them.
+* Usage:
+``` python
+import ddr_score
+ddr_score.fetch_score('/tmp/img_t1_keypoints.json','/tmp/img_t2_keypoints.json')
+```
+
