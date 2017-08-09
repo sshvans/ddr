@@ -88,8 +88,8 @@ def group_move(json1, json2):
 def fetch_score(file1, file2):
     """
         Calculates average movement score between two consecutive dance image snapshots
-    :param file1: Dance image captured at time T1
-    :param file2: Dance image captured at time T2
+    :param file1: Computed JSON file for dance image captured at time T1
+    :param file2: Computed JSON file for dance image captured at time T2
     :return: An array containing: [average group score, total group score, number of people, array of individual scores]
     """
     pose_details1 = load_file(file1)
