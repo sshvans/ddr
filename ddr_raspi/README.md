@@ -75,10 +75,10 @@ macos$ sudo diskutil eject /dev/rdisk2
 
 
 ## Set Physical Connections
-- Insert microsSD Card to "Raspberry Pi 3 Model B"
-- Connect "Raspberry Pi Camera V2" to "Raspberry Pi 3 Model B"
-- Connect "Raspberry Pi 3 Model B" to Mac via ethernet cable
-- Connect "2.5A Power Supply for Raspberry Pi" to "Raspberry Pi Model B"
+- Insert microsSD Card to Raspberry Pi
+- Connect Camera to Raspberry Pi
+- Connect Raspberry Pi to Mac via ethernet cable
+- Connect Power Supply to Raspberry Pi
 
 ## Configure Raspberry Pi
 ### Create SSH Keys
