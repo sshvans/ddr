@@ -13,9 +13,11 @@ s3 = boto3.client('s3')
 with open("ddr_camera.props", 'r') as propsfile:
     props = yaml.load(propsfile)
 
-bucket = props['s3_bucket']
+bucket = props.get('s3_bucket')
+rotation = props.get('rotation', 0)
 
 camera = PiCamera()
+camera.rotation = rotation
 camera.start_preview()
 print 'camera started'
 
