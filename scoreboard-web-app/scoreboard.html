@@ -28,11 +28,13 @@
     <div id="gg1" class="gauge"></div>
     <div id="gg2" class="gauge" data-value="25"></div>
   </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="raphael-2.1.4.min.js"></script>
   <script src="justgage.js"></script>
-  <script>
-  document.addEventListener("DOMContentLoaded", function(event) {
-
+  <!-- Custom Javascript functions below -->
+  <script type="text/javascript">
+    score = 0;
     var dflt = {
       min: 0,
       max: 100,
@@ -42,20 +44,44 @@
       hideInnerShadow: true
     }
 
-    var gg1 = new JustGage({
-      id: 'gg1',
-      value: 75,
-      title: 'Lions',
-      defaults: dflt
-    });
+    $(document).ready(function () {
+      setInterval(updateScore, 2000);
+    })
 
-    var gg2 = new JustGage({
-      id: 'gg2',
-      title: 'Unicorns',
-      defaults: dflt
-    });
-
-  });
+    function updateScore() {
+      $.ajax({
+        type: 'GET',
+        url: 'https://chavctprx1.execute-api.us-west-2.amazonaws.com/prod/score',
+        contentType: 'application/json',
+        dataType: 'json',
+        success: function(response){
+          if(response) {
+              if (response.code == 'FAIL') {
+                $('#gg1').text("Internal server error!");
+              } else {
+                score = response.score;
+                console.log(score);
+                var gg1 = new JustGage({
+                  id: 'gg1',
+                  value: score,
+                  title: 'Lions',
+                  defaults: dflt
+                });
+                var gg2 = new JustGage({
+                  id: 'gg2',
+                  title: 'Unicorns',
+                  defaults: dflt
+                });
+              }
+          }
+        },
+        error: function(e) {
+          if(e) {
+            $('#gg1').text(e);
+          }
+        }
+      })
+    }
   </script>
 </body>
 
