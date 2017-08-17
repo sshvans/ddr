@@ -42,9 +42,20 @@
       gaugeWidthScale: 0.6,
       counter: true,
       hideInnerShadow: true
-    }
-
+    };
+    var gg1 = new JustGage({
+      id: 'gg1',
+      value: 0,
+      title: 'Lions',
+      defaults: dflt
+    });
+    var gg2 = new JustGage({
+      id: 'gg2',
+      title: 'Unicorns',
+      defaults: dflt
+    });
     $(document).ready(function () {
+      // This will update the score every 2 sec (2000 millisec)
       setInterval(updateScore, 2000);
     })
 
@@ -61,17 +72,7 @@
               } else {
                 score = response.score;
                 console.log(score);
-                var gg1 = new JustGage({
-                  id: 'gg1',
-                  value: score,
-                  title: 'Lions',
-                  defaults: dflt
-                });
-                var gg2 = new JustGage({
-                  id: 'gg2',
-                  title: 'Unicorns',
-                  defaults: dflt
-                });
+                gg1.refresh(score);
               }
           }
         },
