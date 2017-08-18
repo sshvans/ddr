@@ -13,6 +13,7 @@ images_table = 'ddr_images'
 s3 = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
 
+
 def put_item(file_ts):
     table = dynamodb.Table(images_table)
     response = table.put_item(
