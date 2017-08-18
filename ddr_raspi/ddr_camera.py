@@ -7,8 +7,22 @@ from time import sleep
 
 import boto3
 import yaml
+import datetime
+images_table = 'ddr_images'
 
 s3 = boto3.client('s3')
+dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
+
+def put_item(file_ts):
+    table = dynamodb.Table(images_table)
+    response = table.put_item(
+        Item={
+            'file_id': 'DUMMY',
+            'file_ts': file_ts, #datetime.datetime.now().isoformat(),
+            'file_name': 'image' + file_ts + '.jpg'
+        }
+    )
+
 
 with open("ddr_camera.props", 'r') as propsfile:
     props = yaml.load(propsfile)
@@ -25,15 +39,17 @@ camera.start_preview()
 # camera warmup
 sleep(2)
 
-print 'camera started'
+print('camera started')
 
 for i in range(5):
-    filename='image%s.jpg' % i
+    file_ts = datetime.datetime.now().isoformat()
+    filename='image' + file_ts + '.jpg'
+    put_item(file_ts)
     pathname='/home/pi/images/' + filename
     camera.capture(pathname)
     sleep(1/captures_per_second)
     data = open(pathname, 'rb')
-    s3.upload_file(pathname, bucket, filename)
+    s3.upload_file(pathname, bucket, 'images/' + filename)
 
 camera.stop_preview()
-print 'camera stopped'
+print('camera stopped')
