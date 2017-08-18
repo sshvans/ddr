@@ -17,29 +17,30 @@ class DecimalEncoder(json.JSONEncoder):
 
 dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
 ddbclient = boto3.client('dynamodb')
-table_name = 'ddr_score'
+score_table = 'ddr_score'
+images_table = 'ddr_images'
 
 
-def create_table():
+def create_table(table_name, partition_key, sort_key):
     table = dynamodb.create_table(
         TableName=table_name,
         KeySchema=[
             {
-                'AttributeName': 'score_id',
+                'AttributeName': partition_key, #'score_id',
                 'KeyType': 'HASH'  #Partition key
             },
             {
-                'AttributeName': 'score_ts',
+                'AttributeName': sort_key, #'score_ts',
                 'KeyType': 'RANGE'  #Sort key
             }
         ],
         AttributeDefinitions=[
             {
-                'AttributeName': 'score_id',
+                'AttributeName': partition_key, #'score_id',
                 'AttributeType': 'S'
             },
             {
-                'AttributeName': 'score_ts',
+                'AttributeName': sort_key, #'score_ts',
                 'AttributeType': 'S'
             }
         ],
@@ -52,18 +53,23 @@ def create_table():
     print("Table status:", table.table_status)
 
 
-def check_or_create_table():
+def check_or_create_table(table_name, partition_key, sort_key):
     try:
         response = ddbclient.describe_table(TableName = table_name)
     except:
         print("Table does not exist, creating...")
-        create_table()
+        create_table(table_name, partition_key, sort_key)
+
+
+def setup_ddb_tables():
+    check_or_create_table(score_table, 'score_id', 'score_ts')
+    check_or_create_table(images_table, 'file_id', 'file_ts')
 
 
 def put_item(score_result):
     #[average group score, total group score, number of people, array of individual scores]
     people_scores = [decimal.Decimal(str(x)) for x in score_result[3]]
-    table = dynamodb.Table(table_name)
+    table = dynamodb.Table(score_table)
     response = table.put_item(
         Item={
             'score_id': 'DUMMY',
@@ -80,7 +86,7 @@ def put_item(score_result):
 
 
 def get_last_score():
-    table = dynamodb.Table(table_name)
+    table = dynamodb.Table(score_table)
     db_res=table.query(KeyConditionExpression=Key('score_id').eq('DUMMY'),Limit=1,ScanIndexForward=False)
     return str(db_res['Items'][0]['group_avg'])
 
