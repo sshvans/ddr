@@ -87,7 +87,7 @@ def put_item(score_result):
 
 def get_last_score():
     table = dynamodb.Table(score_table)
-    db_res=table.query(KeyConditionExpression=Key('score_id').eq('DUMMY'),Limit=1,ScanIndexForward=False)
+    db_res = table.query(KeyConditionExpression=Key('score_id').eq('DUMMY'),Limit=1,ScanIndexForward=False)
     return str(db_res['Items'][0]['group_avg'])
 
 
