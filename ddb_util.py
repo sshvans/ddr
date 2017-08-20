@@ -66,7 +66,7 @@ def setup_ddb_tables():
     check_or_create_table(images_table, 'file_id', 'file_ts')
 
 
-def put_item(score_result):
+def put_score(score_result):
     #[average group score, total group score, number of people, array of individual scores]
     people_scores = [decimal.Decimal(str(x)) for x in score_result[3]]
     table = dynamodb.Table(score_table)
@@ -85,9 +85,50 @@ def put_item(score_result):
     print(json.dumps(response, indent=4, cls=DecimalEncoder))
 
 
+def put_files(file_ts):
+    table = dynamodb.Table(images_table)
+    response = table.put_item(
+        Item={
+            'file_id': 'DUMMY',
+            'file_ts': file_ts, #datetime.datetime.now().isoformat(),
+            'file_name': 'image' + file_ts + '.jpg'
+        }
+    )
+
+
 def get_last_score():
     table = dynamodb.Table(score_table)
     db_res = table.query(KeyConditionExpression=Key('score_id').eq('DUMMY'),Limit=1,ScanIndexForward=False)
     return str(db_res['Items'][0]['group_avg'])
+
+
+def get_next_two_files(last_evaluated_key):
+    table = dynamodb.Table(images_table)
+    #LastEvaluatedKey
+    db_res = table.query(
+        KeyConditionExpression=Key('file_id').eq('DUMMY'),
+        Limit=2,
+        ScanIndexForward=True,
+        ExclusiveStartKey=last_evaluated_key
+    )
+    #print(db_res)
+    return {
+        'files': [x['file_ts'] for x in db_res['Items']],
+        'lastEvaluatedKey': db_res.get('LastEvaluatedKey', None)
+    }
+
+
+def get_first_last_file(is_first):
+    table = dynamodb.Table(images_table)
+    db_res = table.query(
+        KeyConditionExpression=Key('file_id').eq('DUMMY'),
+        Limit=1,
+        ScanIndexForward=is_first
+    )
+    #print(db_res)
+    return {
+        'files': [x['file_ts'] for x in db_res['Items']],
+        'lastEvaluatedKey': db_res['LastEvaluatedKey']
+    }
 
 
