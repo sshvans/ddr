@@ -12,7 +12,7 @@ if not lek:
 
 last_two_files = ddb_util.get_next_two_files(lek)['files']
 
-for i in range(20):
+while True:
     r = ddb_util.get_next_two_files(lek)
 
     if len(r['files']) is 2:
@@ -20,10 +20,9 @@ for i in range(20):
 #        ddr_score.fetch_score()
     else:
         print("No new file, sleeping 10 seconds")
-        time.sleep(10)
+        time.sleep(1)
         continue
 
     print(last_two_files)
-    print(i)
     lek = {'file_id': 'DUMMY', 'file_ts': r['files'][0]}
     # print(lek)
