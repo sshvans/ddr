@@ -3,13 +3,13 @@ import json
 import os
 import traceback
 import time
-
+import urllib2
 
 def poll_sqs():
     sqs = boto3.client('sqs')
     s3 = boto3.resource('s3')
 
-    s3bucket = 'ddr-test-uswest-2'
+    s3bucket = 'ddr-raspi-bucket-1uttsilsw5opt'
     queueUrl = 'https://us-west-2.queue.amazonaws.com/910000848896/ddr-messages'
 
     response = sqs.receive_message(
@@ -27,7 +27,9 @@ def poll_sqs():
         print(s3Keys)
 
         for s3Key in s3Keys:
-            s3.Bucket(s3bucket).download_file(s3Key, os.path.expanduser('~') + '/' + s3Key)
+            s3filename = str(urllib2.unquote(str(s3Key)))
+            print(s3filename)
+            s3.Bucket(s3bucket).download_file(s3filename, os.path.expanduser('~') + '/' + s3filename)
 
         for receipt in receiptHandles:
             sqs.delete_message(
