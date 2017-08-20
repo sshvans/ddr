@@ -2,13 +2,13 @@
 
 # This code is simply for demo and needs to be replaced
 
+import boto3
+import datetime
+import yaml
 from picamera import PiCamera
 from time import sleep
 
-import boto3
-import yaml
-import datetime
-import ddb_util
+from ddr_server import ddb_util
 
 images_table = 'ddr_images'
 

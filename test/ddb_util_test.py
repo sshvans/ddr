@@ -1,6 +1,6 @@
-import ddb_util
-import ddr_score
 import time
+
+from ddr_server import ddb_util
 
 lek = {}
 
@@ -19,8 +19,8 @@ for i in range(20):
         last_two_files = r['files']
 #        ddr_score.fetch_score()
     else:
+        print("No new file, sleeping 10 seconds")
         time.sleep(10)
-        print("sleeping 10 seconds")
         continue
 
     print(last_two_files)
