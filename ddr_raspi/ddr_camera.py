@@ -7,7 +7,6 @@ import datetime
 import yaml
 from picamera import PiCamera
 from time import sleep
-import urllib2
 
 from ddr_server import ddb_util
 
@@ -34,7 +33,7 @@ print('camera started')
 
 for i in range(5):
     file_ts = datetime.datetime.now().isoformat()
-    file_ts_enc = urllib2.quote(file_ts)
+    file_ts_enc = file_ts.replace(':','_')
     filename='image' + file_ts_enc + '.jpg'
     ddb_util.put_files(file_ts)
     pathname='/home/pi/images/' + filename

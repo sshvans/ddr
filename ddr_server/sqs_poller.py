@@ -27,7 +27,7 @@ def poll_sqs():
         print(s3Keys)
 
         for s3Key in s3Keys:
-            s3filename = str(urllib2.unquote(str(s3Key)))
+            s3filename = str(s3Key)
             print(s3filename)
             s3.Bucket(s3bucket).download_file(s3filename, os.path.expanduser('~') + '/' + s3filename)
 
