@@ -24,7 +24,15 @@ while True:
         last_two_files = r['files']
         file1 = os.path.expanduser('~') + '/archived/' + 'image' + str(last_two_files[0]).replace(':','_') + '_keypoints.json'
         file2 = os.path.expanduser('~') + '/archived/' + 'image' + str(last_two_files[1]).replace(':','_') + '_keypoints.json'
-        group_score = ddr_score.fetch_score(file1, file2)
+
+        while True:
+            if os.path.isfile(file1) and os.path.isfile(file2):
+                group_score = ddr_score.fetch_score(file1, file2)
+                break
+            else:
+                time.sleep(2)
+                subprocess.call(os.path.expanduser('~') + '/' + 'openpose.sh')
+
         ddb_util.put_score(group_score)
 
         last_score = ddb_util.get_last_score()
