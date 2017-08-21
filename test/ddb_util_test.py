@@ -1,6 +1,8 @@
 import time
+import os
 
 from ddr_server import ddb_util
+from ddr_server import ddr_score
 
 lek = {}
 
@@ -17,7 +19,11 @@ while True:
 
     if len(r['files']) is 2:
         last_two_files = r['files']
-#        ddr_score.fetch_score()
+        file1 = os.path.expanduser('~') + '/archived/' + 'image' + str(last_two_files[0]).replace(':','_') + '_keypoints.json'
+        file2 = os.path.expanduser('~') + '/archived/' + 'image' + str(last_two_files[2]).replace(':','_') + '_keypoints.json'
+        group_score = ddr_score.fetch_score(file1, file2)
+        ddb_util.put_score(group_score)
+
     else:
         print("No new file, sleeping 10 seconds")
         time.sleep(1)
