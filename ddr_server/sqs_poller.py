@@ -9,7 +9,7 @@ def poll_sqs():
     sqs = boto3.client('sqs')
     s3 = boto3.resource('s3')
 
-    s3bucket = ddr_config.get_config('s3bucket')
+    s3bucket = ddr_config.get_config('s3_bucket')
     queueUrl = ddr_config.get_config('sqs_url')
 
     response = sqs.receive_message(
