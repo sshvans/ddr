@@ -1,1 +1,1 @@
-__all__ = ['ddb_util', 'ddr_score', 'sqs_poller', 'openpose']
+__all__ = ['ddb_util', 'ddr_score', 'sqs_poller', 'ddr_config', 'openpose']

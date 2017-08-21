@@ -3,6 +3,7 @@ import json
 import decimal
 import datetime
 from boto3.dynamodb.conditions import Key, Attr
+from ddr_server import ddr_config
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -17,8 +18,8 @@ class DecimalEncoder(json.JSONEncoder):
 
 dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
 ddbclient = boto3.client('dynamodb')
-score_table = 'ddr_score'
-images_table = 'ddr_images'
+score_table = ddr_config.get_config('ddr_score_table')
+images_table = ddr_config.get_config('ddr_images_table')
 
 
 def create_table(table_name, partition_key, sort_key):

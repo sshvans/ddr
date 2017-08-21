@@ -3,13 +3,14 @@ import json
 import os
 import traceback
 import time
+from ddr_server import ddr_config
 
 def poll_sqs():
     sqs = boto3.client('sqs')
     s3 = boto3.resource('s3')
 
-    s3bucket = 'ddr-raspi-bucket-1uttsilsw5opt'
-    queueUrl = 'https://us-west-2.queue.amazonaws.com/910000848896/ddr-messages'
+    s3bucket = ddr_config.get_config('s3bucket')
+    queueUrl = ddr_config.get_config('sqs_url')
 
     response = sqs.receive_message(
         QueueUrl=queueUrl
