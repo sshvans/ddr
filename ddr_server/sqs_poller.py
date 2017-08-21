@@ -3,6 +3,7 @@ import json
 import os
 import traceback
 import time
+import sys
 from ddr_server import ddr_config
 
 def poll_sqs():
@@ -41,12 +42,18 @@ def poll_sqs():
         print("No messages in sqs")
 
 
-while True:
-    # Run forever, poll queue for new messages, sleeping 100ms in between
-    poll_sqs()
-    time.sleep(0.1)
+def main(argv):
+    while True:
+        # Run forever, poll queue for new messages, sleeping 100ms in between
+        poll_sqs()
+        time.sleep(0.1)
 
-    #print(response['Messages'][0]['Body'])
-    #print(response['Messages'][0]['Body']['Records'][1])
-    #print(response['Messages'][1]['Body'])
-    #print(response)
+        #print(response['Messages'][0]['Body'])
+        #print(response['Messages'][0]['Body']['Records'][1])
+        #print(response['Messages'][1]['Body'])
+        #print(response)
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
+
