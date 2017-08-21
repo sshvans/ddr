@@ -5,7 +5,7 @@ from ddr_server import ddb_util
 lek = {}
 
 if not lek:
-    r1 = ddb_util.get_first_last_file(True)
+    r1 = ddb_util.get_first_last_file(False)
     print(r1['files'])
     lek = r1['lastEvaluatedKey']
     print(lek)
