@@ -3,7 +3,6 @@ import json
 import os
 import traceback
 import time
-import urllib2
 
 def poll_sqs():
     sqs = boto3.client('sqs')
