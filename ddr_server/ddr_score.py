@@ -66,7 +66,7 @@ def group_move(json1, json2):
     :return: An array containing: [average group score, total group score, number of people, array of individual scores]
     """
 
-    num_people = min(len(json1['people']), len(json2['people']))
+    num_people = max(min(len(json1['people']), len(json2['people'])), 1) # Take care of divide by zero error
     pers_scores = []
     group_score = 0.0
 

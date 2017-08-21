@@ -97,10 +97,28 @@ def put_files(file_ts):
     )
 
 
-def get_last_score():
+def get_last_score(last_result):
     table = dynamodb.Table(score_table)
-    db_res = table.query(KeyConditionExpression=Key('score_id').eq('DUMMY'),Limit=1,ScanIndexForward=False)
-    return str(db_res['Items'][0]['group_avg'])
+    last_key = last_result['lastEvaluatedKey']
+    if not last_key:
+        db_res = table.query(KeyConditionExpression=Key('score_id').eq('DUMMY'),Limit=1,ScanIndexForward=False)
+    else:
+        db_res = table.query(
+            KeyConditionExpression=Key('score_id').eq('DUMMY'),
+            Limit=1,
+            ScanIndexForward=True,
+            ExclusiveStartKey=last_key
+        )
+
+    if len(db_res['Items']) > 0:
+        score = str(db_res['Items'][0]['group_total'])
+    else:
+        score = last_result['score']
+
+    return {
+        'score': score,
+        'lastEvaluatedKey': db_res.get('LastEvaluatedKey', None)
+    }
 
 
 def get_next_two_files(last_evaluated_key):
