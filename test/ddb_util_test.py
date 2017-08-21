@@ -13,12 +13,13 @@ if not lek:
     lek = r1['lastEvaluatedKey']
     print(lek)
 
-last_two_files = ddb_util.get_next_two_files(lek)['files']
+#last_two_files = ddb_util.get_next_two_files(lek)['files']
 
 while True:
     r = ddb_util.get_next_two_files(lek)
-
+    last_two_files = r['files']
     if len(r['files']) is 2:
+        print("Starting sub process ")
         subprocess.call(os.path.expanduser('~') + '/' + 'openpose.sh')
         last_two_files = r['files']
         file1 = os.path.expanduser('~') + '/archived/' + 'image' + str(last_two_files[0]).replace(':','_') + '_keypoints.json'
