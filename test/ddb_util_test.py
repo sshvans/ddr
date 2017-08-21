@@ -22,9 +22,12 @@ while True:
         subprocess.call(os.path.expanduser('~') + '/' + 'openpose.sh')
         last_two_files = r['files']
         file1 = os.path.expanduser('~') + '/archived/' + 'image' + str(last_two_files[0]).replace(':','_') + '_keypoints.json'
-        file2 = os.path.expanduser('~') + '/archived/' + 'image' + str(last_two_files[2]).replace(':','_') + '_keypoints.json'
+        file2 = os.path.expanduser('~') + '/archived/' + 'image' + str(last_two_files[1]).replace(':','_') + '_keypoints.json'
         group_score = ddr_score.fetch_score(file1, file2)
         ddb_util.put_score(group_score)
+
+        last_score = ddb_util.get_last_score()
+        print("LAST SCORE: " + last_score)
 
     else:
         print("No new file, sleeping 1 seconds")
