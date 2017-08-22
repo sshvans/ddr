@@ -2,11 +2,15 @@
 
 # This code is simply for demo and needs to be replaced
 
+import boto3
+import datetime
+import yaml
 from picamera import PiCamera
 from time import sleep
 
-import boto3
-import yaml
+from ddr_server import ddb_util
+
+images_table = 'ddr_images'
 
 s3 = boto3.client('s3')
 
@@ -25,15 +29,18 @@ camera.start_preview()
 # camera warmup
 sleep(2)
 
-print 'camera started'
+print('camera started')
 
 for i in range(5):
-    filename='image%s.jpg' % i
+    file_ts = datetime.datetime.now().isoformat()
+    file_ts_enc = file_ts.replace(':','_')
+    filename='image' + file_ts_enc + '.jpg'
+    ddb_util.put_files(file_ts)
     pathname='/home/pi/images/' + filename
     camera.capture(pathname)
     sleep(1/captures_per_second)
     data = open(pathname, 'rb')
-    s3.upload_file(pathname, bucket, filename)
+    s3.upload_file(pathname, bucket, 'images/' + filename)
 
 camera.stop_preview()
-print 'camera stopped'
+print('camera stopped')
