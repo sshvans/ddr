@@ -35,9 +35,6 @@ while True:
 
         ddb_util.put_score(group_score)
 
-        last_score = ddb_util.get_last_score()
-        print("LAST SCORE: " + last_score)
-
     else:
         print("No new file, sleeping 1 seconds")
         time.sleep(1)
