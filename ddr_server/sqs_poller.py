@@ -38,7 +38,7 @@ def poll_sqs():
                 ReceiptHandle=receipt
             )
     except Exception:
-        traceback.print_exc()
+        # traceback.print_exc()
         print("No messages in sqs")
 
 
