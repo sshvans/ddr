@@ -21,6 +21,30 @@ def get_last_score():
     return str(db_res['Items'][0]['group_total'])
 
 
+def get_next_score(last_result):
+    table = dynamodb.Table(table_name)
+    last_key = last_result['lastEvaluatedKey']
+    if not last_key:
+        db_res = table.query(KeyConditionExpression=Key('score_id').eq('DUMMY'),Limit=1,ScanIndexForward=False)
+    else:
+        db_res = table.query(
+            KeyConditionExpression=Key('score_id').eq('DUMMY'),
+            Limit=1,
+            ScanIndexForward=True,
+            ExclusiveStartKey=last_key
+        )
+
+    if len(db_res['Items']) > 0:
+        score = str(db_res['Items'][0]['group_total'])
+    else:
+        score = last_result['score']
+
+    return {
+        'score': score,
+        'lastEvaluatedKey': db_res.get('LastEvaluatedKey', None)
+    }
+
+
 # Lambda function handler method
 def get_score(event, context):
     logger.info('got event {}'.format(event))
