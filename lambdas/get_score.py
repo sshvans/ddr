@@ -4,6 +4,8 @@ from botocore.exceptions import ClientError
 import json
 import simplejson
 import decimal
+import math
+from boto3.dynamodb.conditions import Key, Attr
 
 dynamodb = boto3.resource('dynamodb')
 
@@ -12,6 +14,13 @@ logger.setLevel(logging.DEBUG)
 table_name = 'ddr_score'
 pk = 'pk'
 
+
+def get_last_score():
+    table = dynamodb.Table(table_name)
+    db_res = table.query(KeyConditionExpression=Key('score_id').eq('DUMMY'),Limit=1,ScanIndexForward=False)
+    return str(db_res['Items'][0]['group_total'])
+
+
 # Lambda function handler method
 def get_score(event, context):
     logger.info('got event {}'.format(event))
@@ -19,18 +28,13 @@ def get_score(event, context):
     # Get score
     table = dynamodb.Table(table_name)
 
-    itemObj = table.get_item(
-        Key={
-            'pk': pk
-        },
-        AttributesToGet=[
-            'score'
-        ]
-    )
-    logger.debug('score is {}'.format(itemObj['Item']))
+    fetched_score = get_last_score()
+    transformed_score = math.tanh(float(fetched_score) / 1000.0) * 100.0
+
+    logger.debug('score is {}'.format(transformed_score))
 
     status = {
-        'score': itemObj['Item']['score']
+        'score': transformed_score
     }
 
     response = {
