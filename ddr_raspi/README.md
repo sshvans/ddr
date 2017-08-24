@@ -172,7 +172,10 @@ macos$ ssh -i ~/.ssh/ddr_pi pi@${RASPI_IP} 'chmod +x ddr_camera.py; mkdir images
 ### Run ddr_camera.py
 ```
 macos$ ssh -i ~/.ssh/ddr_pi pi@${RASPI_IP}
-raspi$ ./ddr_camera.py
+raspi$ cd ~
+raspi$ git clone git@github.com:sshvans/ddr.git
+raspi$ cd ddr
+raspi$ python -m ddr_raspi.ddr_camera
 ```
 
 ## Troubleshooting
