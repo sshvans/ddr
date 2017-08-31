@@ -53,7 +53,7 @@ def get_score(event, context):
     table = dynamodb.Table(table_name)
 
     fetched_score = get_last_score()
-    transformed_score = math.tanh(float(fetched_score) / 1000.0) * 100.0
+    transformed_score = math.tanh(float(fetched_score) / 100.0) * 100.0
 
     logger.debug('score is {}'.format(transformed_score))
 
