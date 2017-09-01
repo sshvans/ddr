@@ -23,7 +23,7 @@ captures_per_second = props.get('captures_per_second', 10)
 
 camera = PiCamera()
 camera.rotation = rotation
-
+camera.resolution = (800, 600)
 camera.start_preview()
 
 # camera warmup
