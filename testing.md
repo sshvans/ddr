@@ -24,11 +24,11 @@ python -m ddr_server.sqs_poller
 ```  
 Exit the screen: `Ctrl-A`, `Ctrl-D`
 
-### Run DDR Server
+### Run DDR Runner
  ```bash
 cd ~/ddr
-screen -S ddr-test
-python -m test.ddb_util_test
+screen -S ddr
+python -m ddr_server.ddr_runner
 ```
 Exit the screen: `Ctrl-A`, `Ctrl-D`
 
