@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Images</title>
+  <meta name="viewport" content="width=device-width">
+  <style>
+  .container {
+    width: 600px;
+    margin: 100px auto;
+    text-align: center;
+    align: center;
+  }
+  img {
+    width: 600px;
+    height: 450px;
+    background: url(loading.gif) 50% no-repeat;
+    border: 1px solid black;
+    border-radius: 5px;
+  }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Dance Dance Revolution - Images</h1>
+    </br></br>
+    <div>
+      <img id="danceImage" width="600px" src=""/>
+    </div>
+  </div>
+  <div id="gg1"></div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <!-- Custom Javascript functions below -->
+  <script type="text/javascript">
+    $(document).ready(function () {
+      // This will update the score every 2 sec (2000 millisec)
+      //setInterval(updateScore, 2000);
+      setInterval(updateImage, 800);
+    })
+
+    function updateImage() {
+      $.ajax({
+        type: 'GET',
+        url: 'https://chavctprx1.execute-api.us-west-2.amazonaws.com/prod/image',
+        contentType: 'application/json',
+        dataType: 'json',
+        success: function(response){
+          if(response) {
+              if (response.code == 'FAIL') {
+                $('#gg1').text("Internal server error!");
+              } else {
+                image_name = response.image;
+                console.log(image_name);
+                image_url = "https://s3-us-west-2.amazonaws.com/ddr-raspi-bucket-ljppgft5ycq3/images/" + image_name;
+                var image_tag = document.getElementById('danceImage');
+                var downloadingImage = new Image();
+                downloadingImage.onload = function(){
+                  image_tag.src = this.src;
+                };
+                downloadingImage.src = image_url;
+              }
+          }
+        },
+        error: function(e) {
+          if(e) {
+            $('#gg1').text(e);
+          }
+        }
+      })
+    }
+  </script>
+</body>
+
+</html>
