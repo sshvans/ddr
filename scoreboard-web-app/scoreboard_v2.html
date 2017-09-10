@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Scoreboard</title>
+  <meta name="viewport" content="width=device-width">
+  <style>
+  .container {
+    width: 600px;
+    margin: 100px auto;
+    text-align: center;
+    align: center;
+  }
+  .score {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 40px;
+    font-weight: bold;
+  }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Dance Dance Revolution</h1>
+    </br></br>
+    <canvas id="foo" width="600" height="400"></canvas>
+    <div class="score" id="scoreValue"></div>
+  </div>
+  <div id="gg1"></div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="raphael-2.1.4.min.js"></script>
+  <script src="justgage.js"></script>
+  <!-- http://bernii.github.io/gauge.js/ -->
+  <script src="gauge.min.js"></script>
+  <!-- Custom Javascript functions below -->
+  <script type="text/javascript">
+    score = 0;
+    $(document).ready(function () {
+      // This will update the score every 2 sec (2000 millisec)
+      //setInterval(updateScore, 2000);
+      var gauge = setupGauge();
+      setInterval(updateScore, 800, gauge);
+    })
+
+    function setupGauge() {
+      var opts = {
+          angle: -0.2, // The span of the gauge arc
+          lineWidth: 0.2, // The line thickness
+          radiusScale: 1, // Relative radius
+          pointer: {
+            length: 0.6, // // Relative to gauge radius
+            strokeWidth: 0.038, // The thickness
+            color: '#000000' // Fill color
+          },
+          limitMax: false,     // If false, max value increases automatically if value > maxValue
+          limitMin: false,     // If true, the min value of the gauge will be fixed
+          colorStart: '#6FADCF',   // Colors
+          colorStop: '#8FC0DA',    // just experiment with them
+          strokeColor: '#E0E0E0',  // to see which ones work best for you
+          generateGradient: true,
+          highDpiSupport: true,     // High resolution support
+          percentColors: [[0.0, "#a9d70b" ], [0.50, "#f9c802"], [1.0, "#ff0000"]], // Percentage color
+          staticZones: [
+             {strokeStyle: "#ff0000", min: 2000, max: 3000}, // Red
+             {strokeStyle: "#f9c802", min: 1000, max: 2000}, // Yellow
+             {strokeStyle: "#a9d70b", min: 0, max: 1000}, // Green
+          ]
+        };
+        var target = document.getElementById('foo'); // your canvas element
+        var gauge = new Gauge(target).setOptions(opts); // create sexy gauge!
+        gauge.maxValue = 3000; // set max gauge value
+        gauge.setMinValue(0);  // Prefer setter over gauge.minValue = 0
+        gauge.animationSpeed = 32; // set animation speed (32 is default value)
+        gauge.set(score); // set actual value
+        var scoreDiv = document.getElementById('scoreValue');
+        scoreDiv.innerHTML = score;
+        return gauge;
+      }
+
+    function updateScore(gauge) {
+      $.ajax({
+        type: 'GET',
+        url: 'https://chavctprx1.execute-api.us-west-2.amazonaws.com/prod/score',
+        contentType: 'application/json',
+        dataType: 'json',
+        success: function(response){
+          if(response) {
+              if (response.code == 'FAIL') {
+                $('#gg1').text("Internal server error!");
+              } else {
+                score = response.score;
+                console.log(score);
+                score = normalizeScore(score);  // normalize score
+                gauge.set(score); // update gauge value
+                var scoreDiv = document.getElementById('scoreValue');
+                scoreDiv.innerHTML = score; // update score text
+              }
+          }
+        },
+        error: function(e) {
+          if(e) {
+            $('#gg1').text(e);
+          }
+        }
+      })
+    }
+
+    function normalizeScore(score) {
+      score = Math.round(score);  // round to integer
+      max = 0;
+      if (score < 1000) {
+        min = 0;
+        max = 1000;
+      }
+      else if (score >= 1000 && score < 2000) {
+        min = 1000;
+        max = 2000;
+      }
+      else {
+        min = 2000;
+        max = 3000;
+      }
+      return randomIntFromInterval(min, max);
+    }
+
+    function randomIntFromInterval(min,max)
+    {
+        return Math.floor(Math.random()*(max-min+1)+min);
+    }
+  </script>
+</body>
+
+</html>
