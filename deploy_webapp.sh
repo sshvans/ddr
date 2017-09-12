@@ -11,8 +11,13 @@ cd scoreboard-web-app
 
 for html_file in *.html;
 do
-sed -i '' "s/S3_BUCKET_TOKEN/${S3_BUCKET}/g" ${html_file}
-sed -i '' "s/API_URL_TOKEN/${API_URL}/g" ${html_file}
+sed -i '' "s~S3_BUCKET_TOKEN~${S3_BUCKET}~g" ${html_file}
+sed -i '' "s~API_URL_TOKEN~${API_URL}~g" ${html_file}
 done
 
 aws s3 sync . s3://${S3_WEBAPP_BUCKET}/
+
+for html_file in *.html;
+do
+git checkout $html_file
+done
