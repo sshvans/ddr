@@ -28,6 +28,7 @@
     <div class="score" id="scoreValue"></div>
   </div>
   <div id="gg1"></div>
+  <div id="lekDiv" hidden></div>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="raphael-2.1.4.min.js"></script>
@@ -82,7 +83,7 @@
     function updateScore(gauge) {
       $.ajax({
         type: 'GET',
-        url: 'API_URL_TOKEN/score',
+        url: 'API_URL_TOKEN?lek=' + getUrlParam(),
         contentType: 'application/json',
         dataType: 'json',
         success: function(response){
@@ -91,11 +92,24 @@
                 $('#gg1').text("Internal server error!");
               } else {
                 score = response.score;
+                lek = response.lastEvaluatedKey;
                 console.log(score);
+                encodedLek = encodeURIComponent(JSON.stringify(lek))
+                console.log(encodedLek);
+                console.log("Decoded lek: " + decodeURIComponent(encodedLek));
                 score = normalizeScore(score);  // normalize score
-                gauge.set(score); // update gauge value
+                if (score) {
+                  gauge.set(score); // update gauge value
+                }
                 var scoreDiv = document.getElementById('scoreValue');
-                scoreDiv.innerHTML = score; // update score text
+                var lekDiv = document.getElementById('lekDiv');
+                console.log("Inner html text: " + lekDiv.innerHTML);
+                if (score) {
+                  scoreDiv.innerHTML = score; // update score text
+                }
+                if(lek) {
+                  lekDiv.innerHTML = encodeURIComponent(JSON.stringify(lek));
+                }
               }
           }
         },
@@ -105,6 +119,16 @@
           }
         }
       })
+    }
+
+    function getUrlParam() {
+      var lekDiv = document.getElementById('lekDiv');
+      var lek = lekDiv.innerHTML;
+      if (lek) {
+        return lek;
+      } else {
+        return "null";
+      }
     }
 
     function normalizeScore(score) {
@@ -122,7 +146,7 @@
         min = 2000;
         max = 3000;
       }
-      return randomIntFromInterval(min, max);
+      return score;
     }
 
     function randomIntFromInterval(min,max)

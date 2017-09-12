@@ -11,7 +11,7 @@ dynamodb = boto3.resource('dynamodb')
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
-table_name = 'ddr_images'
+table_name = 'ddr_rendered'
 
 
 def get_last_image():
