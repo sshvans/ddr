@@ -10,5 +10,5 @@ if [ "$(ls -A ~/images/*.jpg)" ]; then
   #aws s3 sync ~/rendered/ s3://ddr-raspi-bucket-1uttsilsw5opt/rendered/
   mv ~/images-processed/*.jpg ~/archived/
   mv ~/json/*.json ~/archived/
-  mv ~/rendered/*.png ~/archived/
+  #mv ~/rendered/*.png ~/archived/
 fi

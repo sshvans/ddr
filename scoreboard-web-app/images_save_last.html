@@ -35,66 +35,7 @@
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <!-- Custom Javascript functions below -->
-  <script type="text/javascript">
-    $(document).ready(function () {
-      // This will update the score every 2 sec (2000 millisec)
-      //setInterval(updateScore, 2000);
-      setInterval(updateImage, 1500);
-    })
-
-    function updateImage() {
-      $.ajax({
-        type: 'GET',
-        url: 'API_URL_TOKEN/image?lek=' + getUrlParam(),
-        contentType: 'application/json',
-        dataType: 'json',
-        success: function(response){
-          if(response) {
-              if (response.code == 'FAIL') {
-                $('#gg1').text("Internal server error!");
-              } else {
-                image_name = response.image;
-                lek = response.lastEvaluatedKey;
-                console.log(image_name);
-                encodedLek = encodeURIComponent(JSON.stringify(lek))
-                console.log("Decoded lek: " + decodeURIComponent(encodedLek));
-
-                if (image_name) {
-                  image_url = "https://s3-us-west-2.amazonaws.com/S3_BUCKET_TOKEN/" + image_name;
-                  var image_tag = document.getElementById('danceImage');
-                  var downloadingImage = new Image();
-                  downloadingImage.onload = function(){
-                    image_tag.src = this.src;
-                  };
-                  downloadingImage.src = image_url;
-                }
-
-                var lekDiv = document.getElementById('lekDiv');
-                if(lek) {
-                lekDiv.innerHTML = encodeURIComponent(JSON.stringify(lek));
-                }
-              }
-          }
-        },
-        error: function(e) {
-          if(e) {
-            $('#gg1').text(e);
-          }
-        }
-      })
-    }
-
-    function getUrlParam() {
-      var lekDiv = document.getElementById('lekDiv');
-      var lek = lekDiv.innerHTML;
-      if (lek) {
-        return lek;
-      } else {
-        return "null";
-      }
-    }
-
-  </script>
+  <script src="ddr-img.js"></script>
 </body>
 
 </html>
