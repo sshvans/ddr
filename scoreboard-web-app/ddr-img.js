@@ -92,6 +92,6 @@ $(document).ready(function () {
             "Encore",
             "Go Vegas"
         ]
-        var x = Math.floor((Math.random() * 12));
+        var x = Math.floor((Math.random() * danceWords.length));
         return danceWords[x];
     }
