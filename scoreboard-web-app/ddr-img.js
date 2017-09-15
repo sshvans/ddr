@@ -7,7 +7,7 @@ $(document).ready(function () {
     function updateImage() {
       $.ajax({
         type: 'GET',
-        url: 'API_URL_TOKEN/image?lek=' + getUrlParam(),
+        url: 'API_URL_TOKEN/image?lek=null',
         contentType: 'application/json',
         dataType: 'json',
         success: function(response){
