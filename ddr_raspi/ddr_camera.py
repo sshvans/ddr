@@ -47,5 +47,7 @@ while True:
         traceback.print_exc()
 
 
-camera.stop_preview()
-print('camera stopped')
+#Infinite loop so the close below is no longer reachable.
+# Python process on raspberry pi needs to be killed to stop capture
+#camera.stop_preview()
+#print('camera stopped')
