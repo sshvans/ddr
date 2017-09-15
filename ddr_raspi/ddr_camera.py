@@ -31,7 +31,7 @@ sleep(2)
 
 print('camera started')
 
-for i in range(200):
+while True:
     file_ts = datetime.datetime.now().isoformat()
     file_ts_enc = file_ts.replace(':','_')
     filename='image' + file_ts_enc + '.jpg'
