@@ -5,7 +5,7 @@ import datetime
 import traceback
 from boto3.dynamodb.conditions import Key, Attr
 from ddr_server import ddr_config
-
+import time
 
 class DecimalEncoder(json.JSONEncoder):
     # Helper class to convert a DynamoDB item to JSON.
@@ -84,7 +84,8 @@ def put_score(score_result):
             'group_avg': decimal.Decimal(str(score_result[0])),
             'group_total': decimal.Decimal(str(score_result[1])),
             'num_people': decimal.Decimal(str(score_result[2])),
-            'people_scores': people_scores
+            'people_scores': people_scores,
+            'ttl': long(time.time() + 900)
         }
     )
 
@@ -98,7 +99,8 @@ def put_files(file_ts):
         Item={
             'file_id': 'DUMMY',
             'file_ts': file_ts, #datetime.datetime.now().isoformat(),
-            'file_name': 'image' + file_ts + '.jpg'
+            'file_name': 'image' + file_ts + '.jpg',
+            'ttl': long(time.time() + 900)
         }
     )
 
