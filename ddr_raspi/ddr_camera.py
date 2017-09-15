@@ -7,6 +7,7 @@ import datetime
 import yaml
 from picamera import PiCamera
 from time import sleep
+import traceback
 
 from ddr_server import ddb_util
 
@@ -32,15 +33,19 @@ sleep(2)
 print('camera started')
 
 while True:
-    file_ts = datetime.datetime.now().isoformat()
-    file_ts_enc = file_ts.replace(':','_')
-    filename='image' + file_ts_enc + '.jpg'
-    ddb_util.put_files(file_ts)
-    pathname='/home/pi/images/' + filename
-    camera.capture(pathname)
-    sleep(1/captures_per_second)
-    data = open(pathname, 'rb')
-    s3.upload_file(pathname, bucket, 'images/' + filename)
+    try:
+        file_ts = datetime.datetime.now().isoformat()
+        file_ts_enc = file_ts.replace(':','_')
+        filename='image' + file_ts_enc + '.jpg'
+        ddb_util.put_files(file_ts)
+        pathname='/home/pi/images/' + filename
+        camera.capture(pathname)
+        sleep(1/captures_per_second)
+        data = open(pathname, 'rb')
+        s3.upload_file(pathname, bucket, 'images/' + filename)
+    except:
+        traceback.print_exc()
+
 
 camera.stop_preview()
 print('camera stopped')
