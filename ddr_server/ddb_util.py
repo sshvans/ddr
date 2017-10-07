@@ -23,6 +23,7 @@ ddbclient = boto3.client('dynamodb', region_name='us-west-2')
 score_table = ddr_config.get_config('ddr_score_table')
 images_table = ddr_config.get_config('ddr_images_table')
 rendered_table = ddr_config.get_config('ddr_rendered_table')
+processed_table = ddr_config.get_config('ddr_processed_table')
 
 
 def create_table(table_name, partition_key, sort_key):
@@ -71,6 +72,7 @@ def setup_ddb_tables():
     check_or_create_table(score_table, 'score_id', 'score_ts')
     check_or_create_table(images_table, 'file_id', 'file_ts')
     check_or_create_table(rendered_table, 'file_id', 'file_ts')
+    check_or_create_table(processed_table, 'file_id', 'file_ts')
 
 
 def put_score(score_result):
@@ -105,6 +107,19 @@ def put_files(file_ts):
     )
 
 
+def log_processed(file_name, table_name):
+    table = dynamodb.Table(table_name)
+    file_ts = file_name[len('image'): len(file_name) - 4].replace('_', ':')
+    response = table.put_item(
+        Item={
+            'file_id': 'DUMMY',
+            'file_ts': file_ts, #datetime.datetime.now().isoformat(),
+            'file_name': file_name,
+            'ttl': long(time.time() + 900)
+        }
+    )
+
+
 def get_last_score(last_result):
     table = dynamodb.Table(score_table)
     last_key = last_result['lastEvaluatedKey']
@@ -130,7 +145,7 @@ def get_last_score(last_result):
 
 
 def get_next_two_files(last_evaluated_key):
-    table = dynamodb.Table(images_table)
+    table = dynamodb.Table(processed_table)
     #LastEvaluatedKey
     db_res = table.query(
         KeyConditionExpression=Key('file_id').eq('DUMMY'),
