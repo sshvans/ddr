@@ -7,6 +7,7 @@ import datetime
 import yaml
 from picamera import PiCamera
 from time import sleep
+import traceback
 
 from ddr_server import ddb_util
 
@@ -23,24 +24,30 @@ captures_per_second = props.get('captures_per_second', 10)
 
 camera = PiCamera()
 camera.rotation = rotation
-
-camera.start_preview()
+camera.resolution = (800, 600)
+camera.start_preview(alpha=128)
 
 # camera warmup
 sleep(2)
 
 print('camera started')
 
-for i in range(200):
-    file_ts = datetime.datetime.now().isoformat()
-    file_ts_enc = file_ts.replace(':','_')
-    filename='image' + file_ts_enc + '.jpg'
-    ddb_util.put_files(file_ts)
-    pathname='/home/pi/images/' + filename
-    camera.capture(pathname)
-    sleep(1/captures_per_second)
-    data = open(pathname, 'rb')
-    s3.upload_file(pathname, bucket, 'images/' + filename)
+while True:
+    try:
+        file_ts = datetime.datetime.now().isoformat()
+        file_ts_enc = file_ts.replace(':','_')
+        filename='image' + file_ts_enc + '.jpg'
+        ddb_util.put_files(file_ts)
+        pathname='/home/pi/images/' + filename
+        camera.capture(pathname)
+        sleep(1/captures_per_second)
+        data = open(pathname, 'rb')
+        s3.upload_file(pathname, bucket, 'images/' + filename)
+    except:
+        traceback.print_exc()
 
-camera.stop_preview()
-print('camera stopped')
+
+#Infinite loop so the close below is no longer reachable.
+# Python process on raspberry pi needs to be killed to stop capture
+#camera.stop_preview()
+#print('camera stopped')

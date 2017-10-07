@@ -24,7 +24,7 @@ def get_last_score():
 def get_next_score(last_result):
     table = dynamodb.Table(table_name)
     last_key = last_result['lastEvaluatedKey']
-    if not last_key:
+    if (not last_key) or (last_key == 'null'):
         db_res = table.query(KeyConditionExpression=Key('score_id').eq('DUMMY'),Limit=1,ScanIndexForward=False)
     else:
         db_res = table.query(
@@ -48,18 +48,24 @@ def get_next_score(last_result):
 # Lambda function handler method
 def get_score(event, context):
     logger.info('got event {}'.format(event))
+    logger.info('lek: {}'.format(event['queryStringParameters']['lek']))
 
     # Get score
     table = dynamodb.Table(table_name)
 
-    fetched_score = get_last_score()
-    transformed_score = math.tanh(float(fetched_score) / 100.0) * 100.0
+    try:
+        lek = json.loads(event['queryStringParameters']['lek'])
+    except:
+        lek = None
+
+    last_score = {'score': None, 'lastEvaluatedKey': lek}
+    fetched_score = get_next_score(last_score)
+    #transformed_score = math.tanh(float(fetched_score) / 50.0) * 100.0
+    transformed_score = fetched_score
 
     logger.debug('score is {}'.format(transformed_score))
 
-    status = {
-        'score': transformed_score
-    }
+    status = transformed_score
 
     response = {
         "statusCode": 200,

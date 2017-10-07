@@ -2,9 +2,10 @@ import boto3
 import json
 import decimal
 import datetime
+import traceback
 from boto3.dynamodb.conditions import Key, Attr
 from ddr_server import ddr_config
-
+import time
 
 class DecimalEncoder(json.JSONEncoder):
     # Helper class to convert a DynamoDB item to JSON.
@@ -17,9 +18,11 @@ class DecimalEncoder(json.JSONEncoder):
         return super(DecimalEncoder, self).default(o)
 
 dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
-ddbclient = boto3.client('dynamodb')
+ddbclient = boto3.client('dynamodb', region_name='us-west-2')
+
 score_table = ddr_config.get_config('ddr_score_table')
 images_table = ddr_config.get_config('ddr_images_table')
+rendered_table = ddr_config.get_config('ddr_rendered_table')
 
 
 def create_table(table_name, partition_key, sort_key):
@@ -57,14 +60,17 @@ def create_table(table_name, partition_key, sort_key):
 def check_or_create_table(table_name, partition_key, sort_key):
     try:
         response = ddbclient.describe_table(TableName = table_name)
+        print(str(response))
     except:
-        print("Table does not exist, creating...")
+        traceback.print_exc()
+        print("Table " + table_name + " does not exist, creating...")
         create_table(table_name, partition_key, sort_key)
 
 
 def setup_ddb_tables():
     check_or_create_table(score_table, 'score_id', 'score_ts')
     check_or_create_table(images_table, 'file_id', 'file_ts')
+    check_or_create_table(rendered_table, 'file_id', 'file_ts')
 
 
 def put_score(score_result):
@@ -78,7 +84,8 @@ def put_score(score_result):
             'group_avg': decimal.Decimal(str(score_result[0])),
             'group_total': decimal.Decimal(str(score_result[1])),
             'num_people': decimal.Decimal(str(score_result[2])),
-            'people_scores': people_scores
+            'people_scores': people_scores,
+            'ttl': long(time.time() + 900)
         }
     )
 
@@ -92,7 +99,8 @@ def put_files(file_ts):
         Item={
             'file_id': 'DUMMY',
             'file_ts': file_ts, #datetime.datetime.now().isoformat(),
-            'file_name': 'image' + file_ts + '.jpg'
+            'file_name': 'image' + file_ts + '.jpg',
+            'ttl': long(time.time() + 900)
         }
     )
 

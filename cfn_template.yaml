@@ -5,9 +5,9 @@ Resources:
   Instance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-e21ef99a
+      ImageId: ami-c7f118bf
       InstanceType: p2.xlarge
-      KeyName: ddr-pdx
+      KeyName: !Ref KeyName
       SecurityGroups:
         - !Ref SecGroup
       Tags:
@@ -35,6 +35,12 @@ Resources:
       Tags:
       - Key: "Name"
         Value: "ddr-secgroup"
+
+Parameters:
+  KeyName:
+    Default: sshvans
+    Description: EC2 key name
+    Type: String
 
 Outputs:
   InstanceId:

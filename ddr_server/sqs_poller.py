@@ -6,6 +6,7 @@ import time
 import sys
 from ddr_server import ddr_config
 
+
 def poll_sqs():
     sqs = boto3.client('sqs')
     s3 = boto3.resource('s3')

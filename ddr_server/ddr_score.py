@@ -66,7 +66,7 @@ def group_move(json1, json2):
     :return: An array containing: [average group score, total group score, number of people, array of individual scores]
     """
 
-    num_people = max(min(len(json1['people']), len(json2['people'])), 1) # Take care of divide by zero error
+    num_people = min(len(json1['people']), len(json2['people'])) # Take care of divide by zero error
     pers_scores = []
     group_score = 0.0
 
@@ -82,7 +82,7 @@ def group_move(json1, json2):
     # print("Group average: " + str(group_score/num_people))
     # print("Individual totals: " + str(pers_scores))
 
-    return [group_score/num_people, group_score, num_people, pers_scores]
+    return [group_score/max(num_people, 1), group_score, num_people, pers_scores]
 
 
 def fetch_score(file1, file2):
