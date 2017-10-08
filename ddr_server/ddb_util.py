@@ -161,7 +161,7 @@ def get_next_two_files(last_evaluated_key):
 
 
 def get_first_last_file(is_first):
-    table = dynamodb.Table(images_table)
+    table = dynamodb.Table(processed_table)
     db_res = table.query(
         KeyConditionExpression=Key('file_id').eq('DUMMY'),
         Limit=1,

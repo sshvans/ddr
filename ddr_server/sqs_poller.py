@@ -46,6 +46,9 @@ def poll_sqs():
             result = processImage(filename, 5555 + serverIndex % numServers)
             if result == "Done.":
                 # heappush(fileQueue, filename)
+                rendered_file = filename.replace(".jpg", "_rendered.png")
+                s3.Bucket(s3bucket).upload_file(os.path.expanduser('~') + '/rendered/' + rendered_file,
+                                                'rendered/' + rendered_file)
                 ddb_util.log_processed(filename, processed_table)
 
         for receipt in receiptHandles:
