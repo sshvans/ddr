@@ -121,12 +121,11 @@ def processOpenpose(s3bucket, s3filename, filename, serverIndex, numServers):
     s3.Bucket(s3bucket).download_file(s3filename, os.path.expanduser('~') + '/' + s3filename)
     result = processImage(filename, 5555 + serverIndex % numServers)
     print("Server result: " + str(result))
-    # if result == "Done.":
-    #     # heappush(fileQueue, filename)
-    #     #rendered_file = filename.replace(".jpg", "_rendered.png")
-    #     #s3.Bucket(s3bucket).upload_file(os.path.expanduser('~') + '/rendered/' + rendered_file,
-    #     #                                'rendered/' + rendered_file)
-    #     ddb_util.log_processed(filename, processed_table, rekResponse)
+    if result == "Done.":
+        # heappush(fileQueue, filename)
+        rendered_file = filename.replace(".jpg", "_rendered.png")
+        s3.Bucket(s3bucket).upload_file(os.path.expanduser('~') + '/rendered/' + rendered_file,
+                                       'rendered/' + rendered_file)
 
     elapsed_time = time.time() - start_time
     print("Processed openpose in: " + str(elapsed_time))
