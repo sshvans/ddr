@@ -107,7 +107,7 @@ def put_files(file_ts):
     )
 
 
-def log_processed(file_name, table_name):
+def log_processed(file_name, table_name, rek_response):
     table = dynamodb.Table(table_name)
     file_ts = file_name[len('image'): len(file_name) - 4].replace('_', ':')
     response = table.put_item(
@@ -115,7 +115,8 @@ def log_processed(file_name, table_name):
             'file_id': 'DUMMY',
             'file_ts': file_ts, #datetime.datetime.now().isoformat(),
             'file_name': file_name,
-            'ttl': long(time.time() + 900)
+            'ttl': long(time.time() + 900),
+            'rek_response': json.dumps(rek_response)
         }
     )
 
