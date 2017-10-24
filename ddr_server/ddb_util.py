@@ -87,8 +87,8 @@ def put_score(score_result):
             'group_total': decimal.Decimal(str(score_result[1])),
             'num_people': decimal.Decimal(str(score_result[2])),
             'people_scores': people_scores,
-            'avg_rek_mult': decimal.Decimal(str(score_result[4])),
-            'max_rek_mult': decimal.Decimal(str(score_result[5])),
+            'rek_avg': decimal.Decimal(str(score_result[4])),
+            'rek_max': decimal.Decimal(str(score_result[5])),
             'ttl': long(time.time() + 900)
         }
     )
