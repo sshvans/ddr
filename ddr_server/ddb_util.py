@@ -87,6 +87,8 @@ def put_score(score_result):
             'group_total': decimal.Decimal(str(score_result[1])),
             'num_people': decimal.Decimal(str(score_result[2])),
             'people_scores': people_scores,
+            'avg_rek_mult': score_result[4],
+            'max_rek_mult': score_result[5],
             'ttl': long(time.time() + 900)
         }
     )
@@ -157,11 +159,30 @@ def get_next_two_files(last_evaluated_key):
     #print(db_res)
     return {
         'files': [x['file_ts'] for x in db_res['Items']],
+        'rek_responses': [x['rek_response'] for x in db_res['Items']],
+        'lastEvaluatedKey': db_res.get('LastEvaluatedKey', None)
+    }
+
+
+def get_two_latest_files():
+    table = dynamodb.Table(processed_table)
+    #LastEvaluatedKey
+    db_res = table.query(
+        KeyConditionExpression=Key('file_id').eq('DUMMY'),
+        Limit=2,
+        ScanIndexForward=False
+    )
+    #print(db_res)
+    return {
+        'files': [x['file_ts'] for x in db_res['Items']],
+        'rek_responses': [x['rek_response'] for x in db_res['Items']],
         'lastEvaluatedKey': db_res.get('LastEvaluatedKey', None)
     }
 
 
 def get_first_last_file(is_first):
+    """is_first: true - return first (earliest) file in table based on sort key
+                 false - return last (latest) file in table based on sort key"""
     table = dynamodb.Table(processed_table)
     db_res = table.query(
         KeyConditionExpression=Key('file_id').eq('DUMMY'),
