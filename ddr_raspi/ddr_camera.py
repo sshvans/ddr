@@ -40,7 +40,7 @@ while True:
         ddb_util.put_files(file_ts)
         pathname='/home/pi/images/' + filename
         camera.capture(pathname)
-        sleep(1/captures_per_second)
+        #sleep(1/captures_per_second)
         data = open(pathname, 'rb')
         s3.upload_file(pathname, bucket, 'images/' + filename)
     except:
