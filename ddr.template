@@ -228,7 +228,7 @@
         },
         "DDRScoreInstance": {
             "Type": "AWS::EC2::Instance",
-            "DependsOn": ["DefaultSG", "DdrSG", "MountTarget1", "MountTarget2"],
+            "DependsOn": ["DefaultSG", "DdrSG"],
             "Metadata": {
                 "HostRole": "DDR Renderer",
                 "AWS::CloudFormation::Init": {
@@ -300,119 +300,11 @@
                                     "Ref": "AWS::Region"
                                 },
                                 "\n",
-                                "mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 ",
-                                {"Ref": "DdrEFS"},
-                                ".efs.us-east-2.amazonaws.com:/ /efs \n",
-                                "mkdir /efs/archived \n",
-                                "rm -rf /home/ubuntu/archived \n",
-                                "cd /home/ubuntu \n",
-                                "ln -s /efs/archived . \n",
-                                "chown -R ubuntu:ubuntu archived \n",
-                                "chown -R ubuntu:ubuntu /efs \n",
                                 "cfn-signal -e $? --stack ",
                                 {
                                     "Ref": "AWS::StackName"
                                 },
                                 " --resource DDRScoreInstance --region ",
-                                {
-                                    "Ref": "AWS::Region"
-                                },
-                                "\n"
-                            ]
-                        ]
-                    }
-                }
-            }
-        },
-        "DDRRenderInstance": {
-            "Type": "AWS::EC2::Instance",
-            "DependsOn": ["DefaultSG", "DdrSG", "MountTarget1", "MountTarget2"],
-            "Metadata": {
-                "HostRole": "DDR Renderer",
-                "AWS::CloudFormation::Init": {
-                    "config": {
-                        "files": {
-                            "/tmp/ddr_efs.txt": {
-                                "content": {
-                                    "Ref": "DdrEFS"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "Properties": {
-                "ImageId": {
-                    "Fn::FindInMap": [
-                        "AWSAMIRegionMap",
-                        {
-                            "Ref": "AWS::Region"
-                        },
-                        "UBUNTUDDR"
-                    ]
-                },
-                "InstanceType": "p2.xlarge",
-                "KeyName": {
-                    "Ref": "KeyName"
-                },
-                "IamInstanceProfile": {
-                    "Ref": "DdrInstanceProfile"
-                },
-                "SecurityGroupIds": [
-                    {
-                        "Ref": "DdrSG"
-                    },
-                    {
-                        "Ref": "DefaultSG"
-                    }
-                ],
-                "Tags": [
-                    {
-                        "Key": "Name",
-                        "Value": "ddr-renderer"
-                    }
-                ],
-                "UserData": {
-                    "Fn::Base64": {
-                        "Fn::Join": [
-                            "",
-                            [
-                                "#!/bin/bash\n",
-                                "export PATH=$PATH:/usr/local/bin\n",
-                                "which pip &> /dev/null\n",
-                                "if [ $? -ne 0 ] ; then\n",
-                                "    echo \"PIP NOT INSTALLED\"\n",
-                                "    [ `which yum` ] && $(yum install -y epel-release; yum install -y python-pip) && echo \"PIP INSTALLED\"\n",
-                                "    [ `which apt-get` ] && apt-get -y update && apt-get -y install python-pip && echo \"PIP INSTALLED\"\n",
-                                "fi\n",
-                                "pip install --upgrade pip &> /dev/null\n",
-                                "pip install awscli --ignore-installed six &> /dev/null\n",
-                                "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
-                                "cfn-init -v --stack ",
-                                {
-                                    "Ref": "AWS::StackName"
-                                },
-                                " --resource DDRRenderInstance ",
-                                " --region ",
-                                {
-                                    "Ref": "AWS::Region"
-                                },
-                                "\n",
-                                "mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 ",
-                                {"Ref": "DdrEFS"},
-                                ".efs.us-east-2.amazonaws.com:/ /efs \n",
-                                "chown -R ubuntu:ubuntu /efs \n",
-                                "mkdir /efs/archived \n",
-                                "rm -rf /home/ubuntu/archived \n",
-                                "cd /home/ubuntu \n",
-                                "ln -s /efs/archived . \n",
-                                "chown -R ubuntu:ubuntu archived \n",
-                                "chown -R ubuntu:ubuntu /efs \n",
-                                "cfn-signal -e $? --stack ",
-                                {
-                                    "Ref": "AWS::StackName"
-                                },
-                                " --resource DDRRenderInstance --region ",
                                 {
                                     "Ref": "AWS::Region"
                                 },
@@ -743,62 +635,6 @@
                 }
             }
         },
-        "DdrEFS": {
-            "Type": "AWS::EFS::FileSystem",
-            "Properties": {
-                "PerformanceMode": "generalPurpose",
-                "FileSystemTags": [
-                    {
-                        "Key": "Name",
-                        "Value": "DDR EFS"
-                    }
-                ]
-            }
-        },
-        "MountTarget1": {
-            "Type": "AWS::EFS::MountTarget",
-            "DependsOn": ["DdrEFS"],
-            "Properties": {
-                "FileSystemId": {
-                    "Ref": "DdrEFS"
-                },
-                "SubnetId": {
-                    "Fn::Select": [
-                        "0",
-                        {
-                            "Ref": "DdrSubnets"
-                        }
-                    ]
-                },
-                "SecurityGroups": [
-                    {
-                        "Ref": "DefaultSG"
-                    }
-                ]
-            }
-        },
-        "MountTarget2": {
-            "Type": "AWS::EFS::MountTarget",
-            "DependsOn": ["DdrEFS"],
-            "Properties": {
-                "FileSystemId": {
-                    "Ref": "DdrEFS"
-                },
-                "SubnetId": {
-                    "Fn::Select": [
-                        "1",
-                        {
-                            "Ref": "DdrSubnets"
-                        }
-                    ]
-                },
-                "SecurityGroups": [
-                    {
-                        "Ref": "DefaultSG"
-                    }
-                ]
-            }
-        },
         "DdrRasPiUser": {
             "Type": "AWS::IAM::User",
             "Properties": {
@@ -850,11 +686,6 @@
                 "Ref": "DDRScoreInstance"
             }
         },
-        "DDRRenderInstanceId": {
-            "Value": {
-                "Ref": "DDRRenderInstance"
-            }
-        },
         "DdrImagesTable": {
             "Value": {
                 "Ref": "DdrImagesTable"
@@ -888,11 +719,6 @@
         "User": {
             "Value": {
                 "Ref": "DdrRasPiUser"
-            }
-        },
-        "DdrEFS": {
-            "Value": {
-                "Ref": "DdrEFS"
             }
         }
     }
