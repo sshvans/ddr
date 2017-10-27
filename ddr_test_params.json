@@ -1,0 +1,30 @@
+[
+    {
+        "ParameterValue": "cikey",
+        "ParameterKey": "KeyName"
+    },
+    {
+        "ParameterValue": "ddr_images",
+        "ParameterKey": "ImagesTableName"
+    },
+    {
+        "ParameterValue": "ddr_score",
+        "ParameterKey": "ScoreTableName"
+    },
+    {
+        "ParameterValue": "ddr_rendered",
+        "ParameterKey": "RenderedTableName"
+    },
+    {
+        "ParameterValue": "vpc-924e8efb",
+        "ParameterKey": "VPCID"
+    },
+    {
+        "ParameterValue": "0.0.0.0/0",
+        "ParameterKey": "RemoteAccessCIDR"
+    },
+    {
+        "ParameterValue": "subnet-1364b97a,subnet-9b8b66e0",
+        "ParameterKey": "DdrSubnets"
+    }
+]
