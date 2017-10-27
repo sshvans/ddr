@@ -37,6 +37,11 @@
             "Default": "ddr_rendered",
             "Description": "Rendered DDR dynamodb table",
             "Type": "String"
+        },
+        "ProcessedTableName": {
+            "Default": "ddr_processed",
+            "Description": "DDR dynamodb table storing processed images and rekognition output",
+            "Type": "String"
         }
     },
     "Mappings": {
@@ -109,7 +114,8 @@
                                     "Resource": [
                                         { "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DdrScoreTable}" },
                                         { "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DdrImagesTable}" },
-                                        { "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DdrRenderedTable}" }
+                                        { "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DdrRenderedTable}" },
+                                        { "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DdrProcessedTable}" }
                                     ]
                                 }
                             ]
@@ -199,7 +205,8 @@
                                     "Resource": [
                                         { "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DdrScoreTable}" },
                                         { "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DdrImagesTable}" },
-                                        { "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DdrRenderedTable}" }
+                                        { "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DdrRenderedTable}" },
+                                        { "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DdrProcessedTable}" }
                                     ]
                                 }
                             ]
@@ -468,6 +475,42 @@
             "Properties": {
                 "TableName": {
                     "Ref": "ImagesTableName"
+                },
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "file_id",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "file_ts",
+                        "AttributeType": "S"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "AttributeName": "file_id",
+                        "KeyType": "HASH"
+                    },
+                    {
+                        "AttributeName": "file_ts",
+                        "KeyType": "RANGE"
+                    }
+                ],
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": "10",
+                    "WriteCapacityUnits": "10"
+                },
+                "TimeToLiveSpecification": {
+                    "AttributeName": "ttl",
+                    "Enabled": "TRUE"
+                }
+            }
+        },
+        "DdrProcessedTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "TableName": {
+                    "Ref": "ProcessedTableName"
                 },
                 "AttributeDefinitions": [
                     {
