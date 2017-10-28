@@ -189,6 +189,25 @@
                                         }
                                     ],
                                     "Effect": "Allow"
+                                },
+                                {
+                                    "Action": [
+                                        "ec2:DescribeInstances"
+                                    ],
+                                    "Resource": "*",
+                                    "Effect": "Allow"
+                                },
+                                {
+                                    "Action": [
+                                        "lambda:AddPermission"
+                                    ],
+                                    "Resource": {
+                                        "Fn::GetAtt": [
+                                            "DDRS3RenderedEventFunction",
+                                            "Arn"
+                                        ]
+                                    },
+                                    "Effect": "Allow"
                                 }
                             ]
                         },
