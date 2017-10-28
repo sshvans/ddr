@@ -82,7 +82,7 @@
     function updateScore(gauge) {
       $.ajax({
         type: 'GET',
-        url: 'API_URL_TOKEN/score',
+        url: 'API_URL_TOKEN/score?lek=null',
         contentType: 'application/json',
         dataType: 'json',
         success: function(response){
