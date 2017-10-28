@@ -1,12 +1,11 @@
 #! /bin/bash
 
-S3_WEBAPP_BUCKET=$( cat ddr_config.props | grep s3_webapp_bucket | cut -d':' -f2 | tr -d ' ' )
-echo ${S3_WEBAPP_BUCKET}
+DDR_S3_WEBAPP=$(aws cloudformation describe-stacks --stack ${CF_STACK_ID} --region ${REGION} | jq '.[]|.[]|.Outputs|.[]|select(.OutputKey == "S3DdrWebapp")|.OutputValue' | tr -d '"');echo ${DDR_S3_WEBAPP}
 
 python deploy_webapp.py
 
 cd scoreboard-web-app
-aws s3 sync . s3://${S3_WEBAPP_BUCKET}/
+aws s3 sync . s3://${DDR_S3_WEBAPP}/
 
 for html_file in *.html;
 do
