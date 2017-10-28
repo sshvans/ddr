@@ -17,8 +17,10 @@ class DecimalEncoder(json.JSONEncoder):
                 return int(o)
         return super(DecimalEncoder, self).default(o)
 
-dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
-ddbclient = boto3.client('dynamodb', region_name='us-west-2')
+s3region = ddr_config.get_config('s3_bucket_region')
+
+dynamodb = boto3.resource('dynamodb', region_name=s3region)
+ddbclient = boto3.client('dynamodb', region_name=s3region)
 
 score_table = ddr_config.get_config('ddr_score_table')
 images_table = ddr_config.get_config('ddr_images_table')
