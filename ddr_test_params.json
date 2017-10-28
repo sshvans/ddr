@@ -16,6 +16,10 @@
         "ParameterKey": "RenderedTableName"
     },
     {
+        "ParameterValue": "ddr_processed",
+        "ParameterKey": "ProcessedTableName"
+    },
+    {
         "ParameterValue": "vpc-924e8efb",
         "ParameterKey": "VPCID"
     },

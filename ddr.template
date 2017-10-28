@@ -50,13 +50,13 @@
                 "UBUNTUDDR": "ubuntu-ddr-ami"
             },
             "us-west-1": {
-                "UBUNTUDDR": "ami-152a1c75"
+                "UBUNTUDDR": "ami-3b162a5b"
             },
             "us-west-2": {
-                "UBUNTUDDR": "ami-db9061a3"
+                "UBUNTUDDR": "ami-3c2ae444"
             },
             "us-east-2": {
-                "UBUNTUDDR": "ami-45f3d120"
+                "UBUNTUDDR": "ami-3e624d5b"
             }
         }
     },
@@ -233,13 +233,6 @@
                 "HostRole": "DDR Renderer",
                 "AWS::CloudFormation::Init": {
                     "config": {
-                        "files": {
-                            "/tmp/ddr_efs.txt": {
-                                "content": {
-                                    "Ref": "DdrEFS"
-                                }
-                            }
-                        }
                     }
                 }
             },
