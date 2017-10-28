@@ -174,6 +174,25 @@
                                 }
                             ]
                         }
+                    },
+                    {
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "cloudformation:DescribeStacks"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Ref": "AWS::StackId"
+                                        }
+                                    ],
+                                    "Effect": "Allow"
+                                }
+                            ]
+                        },
+                        "PolicyName": "ec2-policy"
                     }
                 ]
             }
