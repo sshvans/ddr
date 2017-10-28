@@ -42,6 +42,18 @@
             "Default": "ddr_processed",
             "Description": "DDR dynamodb table storing processed images and rekognition output",
             "Type": "String"
+        },
+        "ArtifactBucket": {
+            "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+            "Description": "S3 bucket containing the templates and other artifacts to deploy the stack. It can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+            "Default": "ddr-assets",
+            "Type": "String"
+        },
+        "ArtifactKeyPrefix": {
+            "AllowedPattern": "^[0-9a-zA-Z-/]*$",
+            "Description": "S3 object key prefix. It can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
+            "Default": "",
+            "Type": "String"
         }
     },
     "Mappings": {
@@ -499,8 +511,75 @@
                 }
             }
         },
+        "DDRS3RenderedEventFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Code": {
+                    "S3Bucket": {
+                        "Ref": "ArtifactBucket"
+                    },
+                    "S3Key": {
+                        "Fn::Sub": "${ArtifactKeyPrefix}assets/DDRS3RenderedEvent.zip"
+                    }
+                },
+                "Handler": "DDRS3RenderedEvent.lambda_handler",
+                "Runtime": "python3.6",
+                "Timeout": "15",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "DdrLambdaRole",
+                        "Arn"
+                    ]
+                }
+            }
+        },
+        "GetDanceScoreFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Code": {
+                    "S3Bucket": {
+                        "Ref": "ArtifactBucket"
+                    },
+                    "S3Key": {
+                        "Fn::Sub": "${ArtifactKeyPrefix}assets/DDRScoreFetch.zip"
+                    }
+                },
+                "Handler": "DDRScoreFetch.get_score",
+                "Runtime": "python3.6",
+                "Timeout": "15",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "DdrLambdaRole",
+                        "Arn"
+                    ]
+                }
+            }
+        },
+        "GetDanceImageFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Code": {
+                    "S3Bucket": {
+                        "Ref": "ArtifactBucket"
+                    },
+                    "S3Key": {
+                        "Fn::Sub": "${ArtifactKeyPrefix}assets/DDRImageFetch.zip"
+                    }
+                },
+                "Handler": "DDRImageFetch.get_image",
+                "Runtime": "python3.6",
+                "Timeout": "15",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "DdrLambdaRole",
+                        "Arn"
+                    ]
+                }
+            }
+        },
         "S3DdrResources": {
             "Type": "AWS::S3::Bucket",
+            "DependsOn": "DDRS3RenderedEventFunction",
             "Properties": {
                 "AccessControl": "Private",
                 "LifecycleConfiguration": {
@@ -514,6 +593,29 @@
                 },
                 "VersioningConfiguration": {
                     "Status": "Suspended"
+                },
+                "NotificationConfiguration": {
+                    "QueueConfigurations": [
+                        {
+                            "Event": "s3:ObjectCreated:Put",
+                            "Filter": {
+                                "S3Key": {
+                                    "Rules": [
+                                        {
+                                            "Name": "prefix",
+                                            "Value": "images/"
+                                        }
+                                    ]
+                                }
+                            },
+                            "Queue": {
+                                "Fn::GetAtt": [
+                                    "DdrMessagesQueue",
+                                    "Arn"
+                                ]
+                            }
+                        }
+                    ]
                 }
             }
         },
@@ -569,10 +671,7 @@
                                         "Fn::Join": [
                                             "",
                                             [
-                                                "arn:aws:s3:*:*:",
-                                                {
-                                                    "Ref": "S3DdrResources"
-                                                }
+                                                "arn:aws:s3:*:*:*ddrresources*"
                                             ]
                                         ]
                                     }
@@ -626,6 +725,255 @@
                         }
                     ]
                 }
+            }
+        },
+        "DDRApi": {
+            "Type" : "AWS::ApiGateway::RestApi",
+            "Properties" : {
+                "Description": "Api used to get dance score from dynamodb table",
+                "FailOnWarnings": true,
+                "Name": "Get Dance Score Api"
+            }
+        },
+        "GetScoreFunctionLambdaPermission": {
+            "Type" : "AWS::Lambda::Permission",
+            "DependsOn" : "GetDanceScoreFunction",
+            "Properties" : {
+                "Action": "lambda:InvokeFunction",
+                "FunctionName": {"Fn::GetAtt": ["GetDanceScoreFunction", "Arn"]},
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {"Fn::Join": ["",
+                    ["arn:aws:execute-api:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":", {"Ref": "DDRApi"}, "/*"]
+                ]}
+            }
+        },
+        "GetImageFunctionLambdaPermission": {
+            "DependsOn": "GetDanceImageFunction",
+            "Type" : "AWS::Lambda::Permission",
+            "Properties" : {
+                "Action": "lambda:InvokeFunction",
+                "FunctionName": {"Fn::GetAtt": ["GetDanceImageFunction", "Arn"]},
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {"Fn::Join": ["",
+                    ["arn:aws:execute-api:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":", {"Ref": "DDRApi"}, "/*"]
+                ]}
+            }
+        },
+        "DDRApiStage": {
+            "DependsOn" : ["ApiGatewayAccount"],
+            "Type": "AWS::ApiGateway::Stage",
+            "Properties": {
+                "DeploymentId": {"Ref": "ApiDeployment"},
+                "MethodSettings": [{
+                    "DataTraceEnabled": true,
+                    "HttpMethod": "*",
+                    "LoggingLevel": "INFO",
+                    "ResourcePath": "/*"
+                }],
+                "RestApiId": {"Ref": "DDRApi"},
+                "StageName": "prod"
+            }
+        },
+        "ApiGatewayCloudWatchLogsRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [{
+                        "Effect": "Allow",
+                        "Principal": { "Service": ["apigateway.amazonaws.com"] },
+                        "Action": ["sts:AssumeRole"]
+                    }]
+                },
+                "Policies": [{
+                    "PolicyName": "ApiGatewayLogsPolicy",
+                    "PolicyDocument": {
+                        "Version": "2012-10-17",
+                        "Statement": [{
+                            "Effect": "Allow",
+                            "Action": [
+                                "logs:CreateLogGroup",
+                                "logs:CreateLogStream",
+                                "logs:DescribeLogGroups",
+                                "logs:DescribeLogStreams",
+                                "logs:PutLogEvents",
+                                "logs:GetLogEvents",
+                                "logs:FilterLogEvents"
+                            ],
+                            "Resource": "*"
+                        }]
+                    }
+                }]
+            }
+        },
+        "ApiGatewayAccount": {
+            "Type" : "AWS::ApiGateway::Account",
+            "Properties" : {
+                "CloudWatchRoleArn" : {"Fn::GetAtt" : ["ApiGatewayCloudWatchLogsRole", "Arn"] }
+            }
+        },
+        "ApiDeployment": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "DependsOn": ["GetScoreRequest"],
+            "Properties": {
+                "RestApiId": {"Ref": "DDRApi"},
+                "StageName": "DummyStage"
+            }
+        },
+        "ScoreResource": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+                "RestApiId": {"Ref": "DDRApi"},
+                "ParentId": {"Fn::GetAtt": ["DDRApi", "RootResourceId"]},
+                "PathPart": "score"
+            }
+        },
+        "ImageResource": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+                "RestApiId": {"Ref": "DDRApi"},
+                "ParentId": {"Fn::GetAtt": ["DDRApi", "RootResourceId"]},
+                "PathPart": "image"
+            }
+        },
+        "GetScoreRequest": {
+            "DependsOn": "GetScoreFunctionLambdaPermission",
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+                "ResourceId": {"Ref": "ScoreResource"},
+                "RestApiId": {"Ref": "DDRApi"},
+                "AuthorizationType": "NONE",
+                "HttpMethod": "GET",
+                "Integration": {
+                    "Type": "AWS_PROXY",
+                    "IntegrationHttpMethod": "POST",
+                    "Uri": {"Fn::Join" : ["",
+                        ["arn:aws:apigateway:", {"Ref": "AWS::Region"}, ":lambda:path/2015-03-31/functions/", {"Fn::GetAtt": ["GetDanceScoreFunction", "Arn"]}, "/invocations"]
+                    ]},
+                    "IntegrationResponses": [{
+                        "ResponseTemplates": {
+                            "application/json": ""
+                        },
+                        "StatusCode": 200
+                    }],
+                    "PassthroughBehavior": "WHEN_NO_MATCH"
+                },
+                "MethodResponses": [{
+                    "ResponseModels": {
+                        "application/json": "Empty"
+                    },
+                    "StatusCode": 200
+                }]
+            }
+        },
+        "ScoreOptionsMethod": {
+            "DependsOn": "GetScoreFunctionLambdaPermission",
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+                "ResourceId": {"Ref": "ScoreResource"},
+                "RestApiId": {"Ref": "DDRApi"},
+                "AuthorizationType": "NONE",
+                "HttpMethod": "OPTIONS",
+                "Integration": {
+                    "Type": "MOCK",
+                    "CacheNamespace": {"Ref": "ScoreResource"},
+                    "RequestTemplates": {
+                        "application/json": "{\"statusCode\": 200}"
+                    },
+                    "IntegrationResponses": [{
+                        "ResponseParameters": {
+                            "method.response.header.Access-Control-Allow-Origin": "'*'",
+                            "method.response.header.Access-Control-Allow-Methods": "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+                        },
+                        "ResponseTemplates": {
+                            "application/json": ""
+                        },
+                        "StatusCode": 200
+                    }],
+                    "PassthroughBehavior": "WHEN_NO_MATCH"
+                },
+                "MethodResponses": [{
+                    "ResponseModels": {
+                        "application/json": "Empty"
+                    },
+                    "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": false,
+                        "method.response.header.Access-Control-Allow-Methods": false,
+                        "method.response.header.Access-Control-Allow-Headers": false
+                    },
+                    "StatusCode": 200
+                }]
+            }
+        },
+        "GetImageRequest": {
+            "DependsOn": "GetScoreFunctionLambdaPermission",
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+                "ResourceId": {"Ref": "ImageResource"},
+                "RestApiId": {"Ref": "DDRApi"},
+                "AuthorizationType": "NONE",
+                "HttpMethod": "GET",
+                "Integration": {
+                    "Type": "AWS_PROXY",
+                    "IntegrationHttpMethod": "POST",
+                    "Uri": {"Fn::Join" : ["",
+                        ["arn:aws:apigateway:", {"Ref": "AWS::Region"}, ":lambda:path/2015-03-31/functions/", {"Fn::GetAtt": ["GetDanceScoreFunction", "Arn"]}, "/invocations"]
+                    ]},
+                    "IntegrationResponses": [{
+                        "ResponseTemplates": {
+                            "application/json": ""
+                        },
+                        "StatusCode": 200
+                    }],
+                    "PassthroughBehavior": "WHEN_NO_MATCH"
+                },
+                "MethodResponses": [{
+                    "ResponseModels": {
+                        "application/json": "Empty"
+                    },
+                    "StatusCode": 200
+                }]
+            }
+        },
+        "ImageOptionsMethod": {
+            "DependsOn": "GetScoreFunctionLambdaPermission",
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+                "ResourceId": {"Ref": "ImageResource"},
+                "RestApiId": {"Ref": "DDRApi"},
+                "AuthorizationType": "NONE",
+                "HttpMethod": "OPTIONS",
+                "Integration": {
+                    "Type": "MOCK",
+                    "CacheNamespace": {"Ref": "ScoreResource"},
+                    "RequestTemplates": {
+                        "application/json": "{\"statusCode\": 200}"
+                    },
+                    "IntegrationResponses": [{
+                        "ResponseParameters": {
+                            "method.response.header.Access-Control-Allow-Origin": "'*'",
+                            "method.response.header.Access-Control-Allow-Methods": "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+                        },
+                        "ResponseTemplates": {
+                            "application/json": ""
+                        },
+                        "StatusCode": 200
+                    }],
+                    "PassthroughBehavior": "WHEN_NO_MATCH"
+                },
+                "MethodResponses": [{
+                    "ResponseModels": {
+                        "application/json": "Empty"
+                    },
+                    "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": false,
+                        "method.response.header.Access-Control-Allow-Methods": false,
+                        "method.response.header.Access-Control-Allow-Headers": false
+                    },
+                    "StatusCode": 200
+                }]
             }
         },
         "DdrRasPiUser": {
