@@ -3,7 +3,7 @@ import boto3
 import time
 from boto3.dynamodb.conditions import Key, Attr
 
-dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
+dynamodb = boto3.resource('dynamodb')
 
 def lambda_handler(event, context):
     #print('received event: ' + str(event))

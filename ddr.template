@@ -69,6 +69,9 @@
             },
             "us-east-2": {
                 "UBUNTUDDR": "ami-3e624d5b"
+            },
+            "us-east-1": {
+                "UBUNTUDDR": "ami-a90fafd3"
             }
         }
     },
@@ -918,7 +921,7 @@
                     "Type": "AWS_PROXY",
                     "IntegrationHttpMethod": "POST",
                     "Uri": {"Fn::Join" : ["",
-                        ["arn:aws:apigateway:", {"Ref": "AWS::Region"}, ":lambda:path/2015-03-31/functions/", {"Fn::GetAtt": ["GetDanceScoreFunction", "Arn"]}, "/invocations"]
+                        ["arn:aws:apigateway:", {"Ref": "AWS::Region"}, ":lambda:path/2015-03-31/functions/", {"Fn::GetAtt": ["GetDanceImageFunction", "Arn"]}, "/invocations"]
                     ]},
                     "IntegrationResponses": [{
                         "ResponseTemplates": {
@@ -946,7 +949,7 @@
                 "HttpMethod": "OPTIONS",
                 "Integration": {
                     "Type": "MOCK",
-                    "CacheNamespace": {"Ref": "ScoreResource"},
+                    "CacheNamespace": {"Ref": "ImageResource"},
                     "RequestTemplates": {
                         "application/json": "{\"statusCode\": 200}"
                     },
@@ -1045,6 +1048,51 @@
         "DdrMessagesQueue": {
             "Value": {
                 "Ref": "DdrMessagesQueue"
+            }
+        },
+        "DdrMessagesQueueARN": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "DdrMessagesQueue",
+                    "Arn"
+                ]
+            }
+        },
+        "DdrS3RenderedFunctionARN": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "DDRS3RenderedEventFunction",
+                    "Arn"
+                ]
+            }
+        },
+        "GetDanceScoreFunctionARN": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "GetDanceScoreFunction",
+                    "Arn"
+                ]
+            }
+        },
+        "GetDanceImageFunctionARN": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "GetDanceImageFunction",
+                    "Arn"
+                ]
+            }
+        },
+        "DdrEC2PublicIp": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "DDRScoreInstance",
+                    "PublicIp"
+                ]
+            }
+        },
+        "DdrApi": {
+            "Value": {
+                "Ref": "DDRApi"
             }
         },
         "S3DdrResources": {
