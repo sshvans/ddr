@@ -83,7 +83,7 @@
     function updateScore(gauge) {
       $.ajax({
         type: 'GET',
-        url: 'API_URL_TOKEN?lek=null',
+        url: 'API_URL_TOKEN/score?lek=null',
         contentType: 'application/json',
         dataType: 'json',
         success: function(response){
@@ -92,12 +92,19 @@
                 $('#gg1').text("Internal server error!");
               } else {
                 score = response.score;
+                console.log("res score: " + score);
+                rek_max = response.rek_max;
+                console.log("rek max: " + rek_max);
                 lek = response.lastEvaluatedKey;
-                console.log(score);
+
                 encodedLek = encodeURIComponent(JSON.stringify(lek))
                 console.log(encodedLek);
                 console.log("Decoded lek: " + decodeURIComponent(encodedLek));
-                score = normalizeScore(score);  // normalize score
+                score = score * rek_max;
+                score = Math.round(score);
+                console.log("Calculated score: " + score);
+
+                //score = normalizeScore(score);  // normalize score
                 if (score) {
                   gauge.set(score); // update gauge value
                 }

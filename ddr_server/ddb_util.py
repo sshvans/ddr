@@ -17,12 +17,15 @@ class DecimalEncoder(json.JSONEncoder):
                 return int(o)
         return super(DecimalEncoder, self).default(o)
 
-dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
-ddbclient = boto3.client('dynamodb', region_name='us-west-2')
+s3region = ddr_config.get_config('s3_bucket_region')
+
+dynamodb = boto3.resource('dynamodb', region_name=s3region)
+ddbclient = boto3.client('dynamodb', region_name=s3region)
 
 score_table = ddr_config.get_config('ddr_score_table')
 images_table = ddr_config.get_config('ddr_images_table')
 rendered_table = ddr_config.get_config('ddr_rendered_table')
+processed_table = ddr_config.get_config('ddr_processed_table')
 
 
 def create_table(table_name, partition_key, sort_key):
@@ -71,6 +74,7 @@ def setup_ddb_tables():
     check_or_create_table(score_table, 'score_id', 'score_ts')
     check_or_create_table(images_table, 'file_id', 'file_ts')
     check_or_create_table(rendered_table, 'file_id', 'file_ts')
+    check_or_create_table(processed_table, 'file_id', 'file_ts')
 
 
 def put_score(score_result):
@@ -85,6 +89,8 @@ def put_score(score_result):
             'group_total': decimal.Decimal(str(score_result[1])),
             'num_people': decimal.Decimal(str(score_result[2])),
             'people_scores': people_scores,
+            'rek_avg': decimal.Decimal(str(score_result[4])),
+            'rek_max': decimal.Decimal(str(score_result[5])),
             'ttl': long(time.time() + 900)
         }
     )
@@ -101,6 +107,20 @@ def put_files(file_ts):
             'file_ts': file_ts, #datetime.datetime.now().isoformat(),
             'file_name': 'image' + file_ts + '.jpg',
             'ttl': long(time.time() + 900)
+        }
+    )
+
+
+def log_processed(file_name, table_name, rek_response):
+    table = dynamodb.Table(table_name)
+    file_ts = file_name[len('image'): len(file_name) - 4].replace('_', ':')
+    response = table.put_item(
+        Item={
+            'file_id': 'DUMMY',
+            'file_ts': file_ts, #datetime.datetime.now().isoformat(),
+            'file_name': file_name,
+            'ttl': long(time.time() + 900),
+            'rek_response': json.dumps(rek_response)
         }
     )
 
@@ -130,7 +150,7 @@ def get_last_score(last_result):
 
 
 def get_next_two_files(last_evaluated_key):
-    table = dynamodb.Table(images_table)
+    table = dynamodb.Table(processed_table)
     #LastEvaluatedKey
     db_res = table.query(
         KeyConditionExpression=Key('file_id').eq('DUMMY'),
@@ -141,12 +161,31 @@ def get_next_two_files(last_evaluated_key):
     #print(db_res)
     return {
         'files': [x['file_ts'] for x in db_res['Items']],
+        'rek_responses': [x['rek_response'] for x in db_res['Items']],
+        'lastEvaluatedKey': db_res.get('LastEvaluatedKey', None)
+    }
+
+
+def get_two_latest_files():
+    table = dynamodb.Table(processed_table)
+    #LastEvaluatedKey
+    db_res = table.query(
+        KeyConditionExpression=Key('file_id').eq('DUMMY'),
+        Limit=2,
+        ScanIndexForward=False
+    )
+    #print(db_res)
+    return {
+        'files': [x['file_ts'] for x in db_res['Items']],
+        'rek_responses': [x['rek_response'] for x in db_res['Items']],
         'lastEvaluatedKey': db_res.get('LastEvaluatedKey', None)
     }
 
 
 def get_first_last_file(is_first):
-    table = dynamodb.Table(images_table)
+    """is_first: true - return first (earliest) file in table based on sort key
+                 false - return last (latest) file in table based on sort key"""
+    table = dynamodb.Table(processed_table)
     db_res = table.query(
         KeyConditionExpression=Key('file_id').eq('DUMMY'),
         Limit=1,

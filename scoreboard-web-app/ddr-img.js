@@ -1,7 +1,7 @@
 $(document).ready(function () {
       // This will update the score every 2 sec (2000 millisec)
       //setInterval(updateScore, 2000);
-      setInterval(updateImage, 4000);
+      setInterval(updateImage, 1500);
     })
 
     function updateImage() {
@@ -35,16 +35,21 @@ $(document).ready(function () {
                   image_link.href = image_url;
                   image_link.style = "background-image: url(" + image_url + "); transform-origin: right bottom 0px;";
 
+                   var graphics_link = document.getElementById('graphicsLink');
+                   graphics_link.href = image_url;
+                   graphics_link.style = "background-image: url(" + image_url + "); transform-origin: right bottom 0px;";
+
+
                 }
 
                 var imageCaption = document.getElementById('ddrCaption');
                 imageCaption.innerHTML = getDanceCaption();
 
-                var graphics_link = document.getElementById('graphicsLink');
-                var imageIndex = Math.floor((Math.random() * 16) + 1);
-                var graphicsUrl = "img/" + imageIndex + ".jpg";
-                graphics_link.href = graphicsUrl;
-                graphics_link.style = "background-image: url(" + graphicsUrl + "); transform-origin: right bottom 0px;";
+//                var graphics_link = document.getElementById('graphicsLink');
+//                var imageIndex = Math.floor((Math.random() * 16) + 1);
+//                var graphicsUrl = "img/" + imageIndex + ".jpg";
+//                graphics_link.href = graphicsUrl;
+//                graphics_link.style = "background-image: url(" + graphicsUrl + "); transform-origin: right bottom 0px;";
 
                 var imageCaption = document.getElementById('graphicsCaption');
                 imageCaption.innerHTML = getDanceCaption();

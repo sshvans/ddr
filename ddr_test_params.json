@@ -1,0 +1,38 @@
+[
+    {
+        "ParameterValue": "cikey",
+        "ParameterKey": "KeyName"
+    },
+    {
+        "ParameterValue": "ddr_images",
+        "ParameterKey": "ImagesTableName"
+    },
+    {
+        "ParameterValue": "ddr_score",
+        "ParameterKey": "ScoreTableName"
+    },
+    {
+        "ParameterValue": "ddr_rendered",
+        "ParameterKey": "RenderedTableName"
+    },
+    {
+        "ParameterValue": "ddr_processed",
+        "ParameterKey": "ProcessedTableName"
+    },
+    {
+        "ParameterValue": "vpc-c3ee26a5",
+        "ParameterKey": "VPCID"
+    },
+    {
+        "ParameterValue": "0.0.0.0/0",
+        "ParameterKey": "RemoteAccessCIDR"
+    },
+    {
+        "ParameterValue": "subnet-8e7bf3a3,subnet-7998e330",
+        "ParameterKey": "DdrSubnets"
+    },
+    {
+        "ParameterValue": "ddr-assets-us-east-1",
+        "ParameterKey": "ArtifactBucket"
+    }
+]
