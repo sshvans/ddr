@@ -27,7 +27,7 @@
     <h1>Dance Dance Revolution - Images</h1>
     </br></br>
     <div>
-      <img id="danceImage" width="600px" src=""/>
+      <img id="danceImage" width="800px" src=""/>
     </div>
   </div>
   <div id="gg1"></div>
@@ -38,13 +38,13 @@
     $(document).ready(function () {
       // This will update the score every 2 sec (2000 millisec)
       //setInterval(updateScore, 2000);
-      setInterval(updateImage, 800);
+      setInterval(updateImage, 500);
     })
 
     function updateImage() {
       $.ajax({
         type: 'GET',
-        url: 'API_URL_TOKEN/image',
+        url: 'API_URL_TOKEN/image?lek=null',
         contentType: 'application/json',
         dataType: 'json',
         success: function(response){
@@ -54,7 +54,7 @@
               } else {
                 image_name = response.image;
                 console.log(image_name);
-                image_url = "https://s3-us-west-2.amazonaws.com/S3_BUCKET_TOKEN/images/" + image_name;
+                image_url = "https://S3_BUCKET_TOKEN.s3.amazonaws.com/" + image_name;
                 var image_tag = document.getElementById('danceImage');
                 var downloadingImage = new Image();
                 downloadingImage.onload = function(){

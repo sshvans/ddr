@@ -1,0 +1,10 @@
+ddr_score_table: ddr_score
+ddr_images_table: ddr_images
+ddr_processed_table: ddr_processed
+ddr_rendered_table: ddr_rendered
+s3_bucket: ddr-raspi-bucket-1uttsilsw5opt
+s3_bucket_region: us-west-2
+sqs_url: https://us-west-2.queue.amazonaws.com/910000848896/ddr-messages
+api_url: https://h2ecghs9n9.execute-api.us-west-2.amazonaws.com/prod
+s3_webapp_bucket: ddr-s3-webapp
+num_op_servers: 1

@@ -1,27 +1,13 @@
 #! /bin/bash
+INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)
+CF_STACK_ID=$(aws ec2 describe-instances   --instance-id $INSTANCE_ID --region ${REGION} | jq '.[]|.[]|.Instances|.[]|.Tags|.[]|select(.Key == "aws:cloudformation:stack-id")|.Value' | tr -d '"')
+DDR_S3_WEBAPP=$(aws cloudformation describe-stacks --stack ${CF_STACK_ID} --region ${REGION} | jq '.[]|.[]|.Outputs|.[]|select(.OutputKey == "S3DdrWebapp")|.OutputValue' | tr -d '"');echo ${DDR_S3_WEBAPP}
 
-S3_BUCKET=$( cat ddr_config.props | grep s3_bucket | cut -d':' -f2 | tr -d ' ' )
-echo ${S3_BUCKET}
-API_URL=$( cat ddr_config.props | grep api_url | cut -d':' -f2- | tr -d ' ' )
-echo ${API_URL}
-S3_WEBAPP_BUCKET=$( cat ddr_config.props | grep s3_webapp_bucket | cut -d':' -f2 | tr -d ' ' )
-echo ${S3_WEBAPP_BUCKET}
+python deploy_webapp.py
 
 cd scoreboard-web-app
-
-for html_file in *.html;
-do
-sed -i '' "s~S3_BUCKET_TOKEN~${S3_BUCKET}~g" ${html_file}
-sed -i '' "s~API_URL_TOKEN~${API_URL}~g" ${html_file}
-done
-
-for js_file in *.js;
-do
-sed -i '' "s~S3_BUCKET_TOKEN~${S3_BUCKET}~g" ${js_file}
-sed -i '' "s~API_URL_TOKEN~${API_URL}~g" ${js_file}
-done
-
-aws s3 sync . s3://${S3_WEBAPP_BUCKET}/
+aws s3 sync . s3://${DDR_S3_WEBAPP}/
 
 for html_file in *.html;
 do
