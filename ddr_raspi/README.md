@@ -11,26 +11,22 @@ The following hardware was used:
 - 2.5A Power Supply for Raspberry Pi
 - SanDisk Ultra 16 GB microSDHC UHS-I Card w/ Adapter
 
-### Create AWS Resources
-
-```
-macos$ aws cloudformation create-stack --stack-name ddr-raspi --template-body file://ddr_raspi.yaml --capabilities CAPABILITY_NAMED_IAM; aws cloudformation wait stack-create-complete --stack-name ddr-raspi
-```
-
 ### Create Access Keys
 *Note: Record AccessKeyId and SecretAccessKey so you can use them later when configuring AWS credentials on the Raspberry Pi*
 
-```
-RASPI_USER=$(aws cloudformation describe-stacks --stack-name ddr-raspi --query 'Stacks[].Outputs[?OutputKey==`User`].OutputValue' --output text); echo $RASPI_USER
-macos$ aws iam create-access-key --user-name ${RASPI_USER}
+```bash
+RASPI_USER=$(aws cloudformation describe-stacks --stack-name \
+ ${CF_STACK_ID} --query 'Stacks[].Outputs[?OutputKey==`User`].OutputValue' \
+ --output text --region ${REGION});  echo $RASPI_USER
+
+aws iam create-access-key --user-name ${RASPI_USER}
 ```
 
 ### Create Properties File (ddr_camera.props)
 ```
-macos$ IMAGE_BUCKET=$(aws cloudformation describe-stacks --stack-name ddr-raspi --query 'Stacks[].Outputs[?OutputKey==`Bucket`].OutputValue' --output text); echo $IMAGE_BUCKET
+macos$ IMAGE_BUCKET=$(aws cloudformation describe-stacks --stack-name ${CF_STACK_ID} --query 'Stacks[].Outputs[?OutputKey==`S3DdrResources`].OutputValue' --output text); echo $IMAGE_BUCKET
 macos$ echo "s3_bucket: ${IMAGE_BUCKET}" | tee ddr_camera.props
 ```
-
 
 ## Install Raspbian on microSD Card
 
@@ -162,19 +158,23 @@ raspi$ sudo pip install awscli boto3
 raspi$ aws configure
 ```
 
-## Deploy ddr_camera.py and ddr_camera.props
-```
-raspi$ exit
-macos$ scp -i ~/.ssh/ddr_pi -r ddr_camera.* pi@${RASPI_IP}:.
-macos$ ssh -i ~/.ssh/ddr_pi pi@${RASPI_IP} 'chmod +x ddr_camera.py; mkdir images;'
+## Deploy project and 2 config files: ddr_camera.props, ddr_config.props
+```bash
+# Clone the git repo on raspberry pi in home directory
+raspi$ cd ~
+raspi$ git clone https://github.com/sshvans/ddr.git
+# Create directory for storing captured images
+raspi$ mkdir ~/images;
+# Copy ddr_config.props from openpose EC2 to local computer
+macos$ scp -i ddr-pdx.pem ubuntu@34.236.149.138:~/ddr/ddr_config.props /tmp/ 
+macos$ scp ddr_camera.props pi@${RASPI_IP}:~/ddr/
+macos$ scp /tmp/ddr_config.props pi@${RASPI_IP}:~/ddr/
 ```
 
 ### Run ddr_camera.py
 ```
 macos$ ssh -i ~/.ssh/ddr_pi pi@${RASPI_IP}
-raspi$ cd ~
-raspi$ git clone git@github.com:sshvans/ddr.git
-raspi$ cd ddr
+raspi$ cd ~/ddr
 raspi$ python -m ddr_raspi.ddr_camera
 ```
 
