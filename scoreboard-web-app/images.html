@@ -54,7 +54,7 @@
               } else {
                 image_name = response.image;
                 console.log(image_name);
-                image_url = "https://s3-us-west-2.amazonaws.com/S3_BUCKET_TOKEN/" + image_name;
+                image_url = "https://S3_BUCKET_TOKEN.s3.amazonaws.com/" + image_name;
                 var image_tag = document.getElementById('danceImage');
                 var downloadingImage = new Image();
                 downloadingImage.onload = function(){
