@@ -288,27 +288,72 @@
                 "HostRole": "DDR Renderer",
                 "AWS::CloudFormation::Init": {
                     "config": {
-                        "/tmp/ddr_config.props": {
-                            "content": {
-                                "Fn::Join": [
-                                    "",
-                                    [
-                                        "ddr_score_table: ", {"Ref": "ScoreTableName"}, "\n",
-                                        "ddr_images_table: ", {"Ref": "ImagesTableName"}, "\n",
-                                        "ddr_processed_table: ", {"Ref": "ProcessedTableName"}, "\n",
-                                        "ddr_rendered_table: ", {"Ref": "RenderedTableName"}, "\n",
-                                        "s3_bucket: ", {"Ref": "S3DdrResources"}, "\n",
-                                        "s3_webapp_bucket: ", {"Ref": "S3DdrWebapp"}, "\n",
-                                        "s3_bucket_region: ", {"Ref": "AWS::Region"}, "\n",
-                                        "sqs_url: ", {"Ref": "DdrMessagesQueue"}, "\n",
-                                        "api_url: ", "https://", {"Ref": "DDRApi"}, ".execute-api.", {"Ref": "AWS::Region"}, ".amazonaws.com/prod", "\n",
-                                        "num_op_servers: 1", "\n"
+                        "files": {
+                            "/tmp/ddr_config.props": {
+                                "content": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "ddr_score_table: ",
+                                            {
+                                                "Ref": "ScoreTableName"
+                                            },
+                                            "\n",
+                                            "ddr_images_table: ",
+                                            {
+                                                "Ref": "ImagesTableName"
+                                            },
+                                            "\n",
+                                            "ddr_processed_table: ",
+                                            {
+                                                "Ref": "ProcessedTableName"
+                                            },
+                                            "\n",
+                                            "ddr_rendered_table: ",
+                                            {
+                                                "Ref": "RenderedTableName"
+                                            },
+                                            "\n",
+                                            "s3_bucket: ",
+                                            {
+                                                "Ref": "S3DdrResources"
+                                            },
+                                            "\n",
+                                            "s3_webapp_bucket: ",
+                                            {
+                                                "Ref": "S3DdrWebapp"
+                                            },
+                                            "\n",
+                                            "s3_bucket_region: ",
+                                            {
+                                                "Ref": "AWS::Region"
+                                            },
+                                            "\n",
+                                            "sqs_url: ",
+                                            {
+                                                "Ref": "DdrMessagesQueue"
+                                            },
+                                            "\n",
+                                            "api_url: ",
+                                            "https://",
+                                            {
+                                                "Ref": "DDRApi"
+                                            },
+                                            ".execute-api.",
+                                            {
+                                                "Ref": "AWS::Region"
+                                            },
+                                            ".amazonaws.com/prod",
+                                            "\n",
+                                            "num_op_servers: 1",
+                                            "\n"
+                                        ]
                                     ]
-                                ]
-                            },
-                            "mode": "000666",
-                            "owner": "root",
-                            "group": "root"
+                                },
+                                "mode": "000666",
+                                "owner": "root",
+                                "group": "root"
+                            }
                         }
                     }
                 }
