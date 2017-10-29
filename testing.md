@@ -45,10 +45,10 @@ aws cloudformation --region ${REGION} create-stack --stack-name ddr-stack \
 ```   
 
 ### Run scripts on server
-1. Use the console or CLI to get the public ip of the instance launched
+1. Use the console or CLI to get the public ip of the instance launched. Substitute STACK_ID and REGION below.
 
-`aws cloudformation describe-stacks --stack ${STACK_ID} \
-  --region us-east-1 | jq '.[]|.[]|.Outputs|.[]|select(.OutputKey == "DdrEC2PublicIp")|.OutputValue'`
+```aws cloudformation describe-stacks --stack ${STACK_ID} --region ${REGION} \
+   | jq '.[]|.[]|.Outputs|.[]|select(.OutputKey == "DdrEC2PublicIp")|.OutputValue'```
 
 2. SSH to the EC2 server with the IP identified above
 `ssh -i ddr-pdx.pem ubuntu@34.236.149.123`
@@ -84,7 +84,7 @@ Ensure the following:
 * `run_server.sh` has been executed on openpose EC2 instance
   * `ps -ef | grep python` and `ps -ef | grep op_server` should list the processes
   e.g.
-      ```
+      ```bash
       ubuntu@ip-172-31-9-99:~/ddr$ ps -ef | grep python
       ubuntu    2861     1  0 02:34 pts/1    00:00:35 python -m ddr_server.ddr_runner
       ubuntu    2862     1 16 02:34 pts/1    00:23:10 python -m ddr_server.sqs_poller
