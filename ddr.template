@@ -109,7 +109,9 @@
                                     ],
                                     "Resource": [
                                         { "Fn::Sub": "arn:aws:s3:::${S3DdrResources}" },
-                                        { "Fn::Sub": "arn:aws:s3:::${S3DdrResources}/*" }
+                                        { "Fn::Sub": "arn:aws:s3:::${S3DdrResources}/*" },
+                                        { "Fn::Sub": "arn:aws:s3:::${S3DdrWebapp}" },
+                                        { "Fn::Sub": "arn:aws:s3:::${S3DdrWebapp}/*" }
                                     ]
                                 },
                                 {
