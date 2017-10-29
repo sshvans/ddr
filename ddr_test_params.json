@@ -20,7 +20,7 @@
         "ParameterKey": "ProcessedTableName"
     },
     {
-        "ParameterValue": "vpc-924e8efb",
+        "ParameterValue": "vpc-c3ee26a5",
         "ParameterKey": "VPCID"
     },
     {
@@ -28,7 +28,11 @@
         "ParameterKey": "RemoteAccessCIDR"
     },
     {
-        "ParameterValue": "subnet-1364b97a,subnet-9b8b66e0",
+        "ParameterValue": "subnet-8e7bf3a3,subnet-7998e330",
         "ParameterKey": "DdrSubnets"
+    },
+    {
+        "ParameterValue": "ddr-assets-us-east-1",
+        "ParameterKey": "ArtifactBucket"
     }
 ]
