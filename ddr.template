@@ -56,6 +56,27 @@
             "Type": "String"
         }
     },
+    "Rules": {
+        "RekognitionRegionRule": {
+            "Assertions": [
+                {
+                    "Assert": {
+                        "Fn::Contains": [
+                            [
+                                "us-east-1",
+                                "us-west-2",
+                                "eu-west-1"
+                            ],
+                            {
+                                "Ref": "AWS::Region"
+                            }
+                        ]
+                    },
+                    "AssertDescription": "This Quick Start utilizes Amazon Rekognition which is only available in the US East (N. Virginia), US West (Oregon) and EU (Ireland) regions. Please launch the stack in one of these regions"
+                }
+            ]
+        }
+    },
     "Mappings": {
         "AWSAMIRegionMap": {
             "AMI": {
