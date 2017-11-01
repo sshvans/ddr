@@ -14,7 +14,7 @@ A cloudformation template: `ddr.template` has been provided to automate the serv
 The lambda scripts are uploaded as zip files and can be sourced only from S3 buckets in the same region.
 
 ### Upload Lambda assets
-1. Pick a region to host the project: us-east-1, us-west-1 or eu-west-1.
+1. Pick a region to host the project: us-east-1, us-west-2 or eu-west-1.
 2. Create or re-use a bucket in region: 
    `aws s3 mb s3://<bucket-name> --region <region>`
 3. Deploy lambda functions using `deploy_lambda.sh`
