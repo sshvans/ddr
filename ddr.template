@@ -76,17 +76,14 @@
             "AMI": {
                 "UBUNTUDDR": "ubuntu-ddr-ami"
             },
-            "us-west-1": {
-                "UBUNTUDDR": "ami-3b162a5b"
-            },
-            "us-west-2": {
-                "UBUNTUDDR": "ami-3c2ae444"
-            },
-            "us-east-2": {
-                "UBUNTUDDR": "ami-3e624d5b"
+            "eu-west-1": {
+                "UBUNTUDDR": "ami-dcc96ea5"
             },
             "us-east-1": {
                 "UBUNTUDDR": "ami-a90fafd3"
+            },
+            "us-west-2": {
+                "UBUNTUDDR": "ami-3c2ae444"
             }
         }
     },
