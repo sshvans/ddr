@@ -445,7 +445,6 @@
         "DdrSG": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
-                "GroupName": "ddr-secgroup",
                 "GroupDescription": "ddr-secgroup",
                 "VpcId": {
                     "Ref": "VPCID"
@@ -707,7 +706,7 @@
                 "LifecycleConfiguration": {
                     "Rules": [
                         {
-                            "ExpirationInDays": "1",
+                            "ExpirationInDays": "7",
                             "Id": "Expire Old Objects",
                             "Status": "Enabled"
                         }

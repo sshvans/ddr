@@ -47,8 +47,10 @@ aws cloudformation --region ${REGION} create-stack --stack-name ddr-stack \
 ### Run scripts on server
 1. Use the console or CLI to get the public ip of the instance launched. Substitute STACK_ID and REGION below.
 
-```aws cloudformation describe-stacks --stack ${STACK_ID} --region ${REGION} \
-   | jq '.[]|.[]|.Outputs|.[]|select(.OutputKey == "DdrEC2PublicIp")|.OutputValue'```
+   ```
+   aws cloudformation describe-stacks --stack ${STACK_ID} --region ${REGION} \
+   | jq '.[]|.[]|.Outputs|.[]|select(.OutputKey == "DdrEC2PublicIp")|.OutputValue'
+   ```
 
 2. SSH to the EC2 server with the IP identified above
 `ssh -i ddr-pdx.pem ubuntu@34.236.149.123`
