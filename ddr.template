@@ -11,12 +11,6 @@
             "Description": "VPC ID",
             "Type": "AWS::EC2::VPC::Id"
         },
-        "DdrSubnets": {
-            "ConstraintDescription": "must be list of existing subnet Ids",
-            "Default": "",
-            "Description": "A list of subnet identifiers of Amazon VPCs where the DDR instances and EFS would be launched.",
-            "Type": "List<AWS::EC2::Subnet::Id>"
-        },
         "RemoteAccessCIDR": {
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$",
             "ConstraintDescription": "Must be a valid IP range in x.x.x.x/x notation",
@@ -82,17 +76,14 @@
             "AMI": {
                 "UBUNTUDDR": "ubuntu-ddr-ami"
             },
-            "us-west-1": {
-                "UBUNTUDDR": "ami-3b162a5b"
-            },
-            "us-west-2": {
-                "UBUNTUDDR": "ami-3c2ae444"
-            },
-            "us-east-2": {
-                "UBUNTUDDR": "ami-3e624d5b"
+            "eu-west-1": {
+                "UBUNTUDDR": "ami-dcc96ea5"
             },
             "us-east-1": {
                 "UBUNTUDDR": "ami-a90fafd3"
+            },
+            "us-west-2": {
+                "UBUNTUDDR": "ami-3c2ae444"
             }
         }
     },
@@ -454,7 +445,6 @@
         "DdrSG": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
-                "GroupName": "ddr-secgroup",
                 "GroupDescription": "ddr-secgroup",
                 "VpcId": {
                     "Ref": "VPCID"
@@ -716,7 +706,7 @@
                 "LifecycleConfiguration": {
                     "Rules": [
                         {
-                            "ExpirationInDays": "1",
+                            "ExpirationInDays": "7",
                             "Id": "Expire Old Objects",
                             "Status": "Enabled"
                         }

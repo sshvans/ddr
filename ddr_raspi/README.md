@@ -162,7 +162,7 @@ raspi$ aws configure
 ```bash
 # Clone the git repo on raspberry pi in home directory
 raspi$ cd ~
-raspi$ git clone https://github.com/sshvans/ddr.git
+raspi$ git clone https://github.com/vsnyc/ddr.git
 # Create directory for storing captured images
 raspi$ mkdir ~/images;
 # Copy ddr_config.props from openpose EC2 to local computer
