@@ -1,5 +1,7 @@
 # DDR
 
+![DDR Architecture](/images/ddr_architecture_diagram.png?raw=true "DDR Architecture")
+
 ## Pre-requisites
 
 This project uses Amazon Rekognition and can be run in one of three regions:
@@ -27,7 +29,7 @@ The script expects three arguments, in this order:
 * `lambda_assets_bucket`: name of a new bucket to host lambda assets 
 
 The script creates the above named buckets, hosts all lambda assets in the bucket and then launches ddr.template cloudformation stack
-taking ddr_test_params.json file as input. The file contains three tokens for VPCID, KeyName, ArtifactBucket. The script chooses your default VPC
+taking `ddr_test_params.json` file as input. The file contains three tokens for VPCID, KeyName, ArtifactBucket. The script chooses your default VPC
 and uses input values for the other two parameters. Please also note that it grants access from anywhere by having 0.0.0.0/0 in the RemoteAccessCIDR parameter.
 This is strictly for demo purpose and you should change this value to your IP for security. The parameters file can be modified to match your environment.
 
