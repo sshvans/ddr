@@ -64,14 +64,14 @@
           highDpiSupport: true,     // High resolution support
           percentColors: [[0.0, "#a9d70b" ], [0.50, "#f9c802"], [1.0, "#ff0000"]], // Percentage color
           staticZones: [
-             {strokeStyle: "#ff0000", min: 2000, max: 3000}, // Red
-             {strokeStyle: "#f9c802", min: 1000, max: 2000}, // Yellow
-             {strokeStyle: "#a9d70b", min: 0, max: 1000}, // Green
+             {strokeStyle: "#ff0000", min: 20000, max: 30000}, // Red
+             {strokeStyle: "#f9c802", min: 10000, max: 20000}, // Yellow
+             {strokeStyle: "#a9d70b", min: 0, max: 10000}, // Green
           ]
         };
         var target = document.getElementById('foo'); // your canvas element
         var gauge = new Gauge(target).setOptions(opts); // create sexy gauge!
-        gauge.maxValue = 3000; // set max gauge value
+        gauge.maxValue = 30000; // set max gauge value
         gauge.setMinValue(0);  // Prefer setter over gauge.minValue = 0
         gauge.animationSpeed = 32; // set animation speed (32 is default value)
         gauge.set(score); // set actual value
@@ -143,15 +143,15 @@
       max = 0;
       if (score < 1000) {
         min = 0;
-        max = 1000;
+        max = 3000;
       }
       else if (score >= 1000 && score < 2000) {
-        min = 1000;
-        max = 2000;
+        min = 3000;
+        max = 9000;
       }
       else {
-        min = 2000;
-        max = 3000;
+        min = 9000;
+        max = 20000;
       }
       return randomIntFromInterval(score, score + 300);
     }

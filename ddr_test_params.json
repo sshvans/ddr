@@ -1,6 +1,6 @@
 [
     {
-        "ParameterValue": "cikey",
+        "ParameterValue": "KEYNAME_TOKEN",
         "ParameterKey": "KeyName"
     },
     {
@@ -20,7 +20,7 @@
         "ParameterKey": "ProcessedTableName"
     },
     {
-        "ParameterValue": "vpc-c3ee26a5",
+        "ParameterValue": "VPC_TOKEN",
         "ParameterKey": "VPCID"
     },
     {
@@ -28,11 +28,7 @@
         "ParameterKey": "RemoteAccessCIDR"
     },
     {
-        "ParameterValue": "subnet-8e7bf3a3,subnet-7998e330",
-        "ParameterKey": "DdrSubnets"
-    },
-    {
-        "ParameterValue": "ddr-assets-us-east-1",
+        "ParameterValue": "BUCKET_TOKEN",
         "ParameterKey": "ArtifactBucket"
     }
 ]
